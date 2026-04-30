@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Monitoring Driver</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <!-- Chart.js untuk Grafik -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: white; text-align: center; margin: 0; padding: 20px; }
+        .container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; max-width: 1000px; margin: auto; }
+        .card { background: #1e1e1e; padding: 20px; border-radius: 15px; width: 280px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-top: 5px solid #007bff; }
+        .value { font-size: 2.5rem; font-weight: bold; margin: 10px 0; }
+        .unit { font-size: 1rem; color: #bbb; }
+        .status-box { width: 100%; padding: 15px; border-radius: 10px; font-size: 1.5rem; font-weight: bold; margin-bottom: 20px; }
+        .normal { background: #2ecc71; color: white; }
+        .warning { background: #e74c3c; color: white; animation: blink 1s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .chart-container { background: #1e1e1e; padding: 20px; border-radius: 15px; width: 100%; max-width: 900px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <h1>DRIVER MONITORING SYSTEM</h1>
+    
+    <div id="statusIndicator" class="status-box normal">KONDISI: NORMAL</div>
+
+    <div class="container">
+        <div class="card">
+            <div class="unit">HEART RATE</div>
+            <div id="bpmVal" class="value">0</div>
+            <div class="unit">BPM</div>
+        </div>
+        <div class="card" style="border-top-color: #f1c40f;">
+            <div class="unit">POSTURE (PITCH)</div>
+            <div id="pitchVal" class="value">0.0</div>
+            <div class="unit">Degree</div>
+        </div>
+        <div class="card" style="border-top-color: #9b59b6;">
+            <div class="unit">POSTURE (ROLL)</div>
+            <div id="rollVal" class="value">0.0</div>
+            <div class="unit">Degree</div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="bpmChart"></canvas>
+    </div>
+
+    <script>
+        // Konfigurasi Firebase - Ganti URL jika berbeda
+        const firebaseConfig = {
+            databaseURL: "https://driver-monitoring-5cce0-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database().ref("monitoring");
+
+        // Inisialisasi Grafik
+        const ctx = document.getElementById('bpmChart').getContext('2d');
+        const bpmChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Detak Jantung (BPM)',
+                    data: [],
+                    borderColor: '#2ecc71',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                scales: {
+                    x: { display: false },
+                    y: { min: 40, max: 160 }
+                }
+            }
+        });
+
+        // Ambil data Real-time
+        db.on("value", (snapshot) => {
+            const data = snapshot.val();
+            if(!data) return;
+
+            // Update Angka
+            document.getElementById("bpmVal").innerText = data.bpm;
+            document.getElementById("pitchVal").innerText = data.pitch.toFixed(1);
+            document.getElementById("rollVal").innerText = data.roll.toFixed(1);
+
+            // Update Status Drowsy
+            const statusBox = document.getElementById("statusIndicator");
+            if (data.drowsy === true || data.drowsy === "true") {
+                statusBox.innerText = "KONDISI: DROWSY (MENGANTUK!)";
+                statusBox.className = "status-box warning";
+            } else {
+                statusBox.innerText = "KONDISI: NORMAL";
+                statusBox.className = "status-box normal";
+            }
+
+            // Update Grafik
+            const now = new Date();
+            const timeStr = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+            
+            bpmChart.data.labels.push(timeStr);
+            bpmChart.data.datasets[0].data.push(data.bpm);
+
+            if (bpmChart.data.labels.length > 20) {
+                bpmChart.data.labels.shift();
+                bpmChart.data.datasets[0].data.shift();
+            }
+            bpmChart.update();
+        });
+    </script>
+</body>
+</html>
