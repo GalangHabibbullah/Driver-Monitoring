@@ -3,24 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Driver Monitoring System</title>
+    <title>Advanced Driver Monitoring System v2.1</title>
+    
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg-color: #0b0e14;
+            --bg-color: #0d1117;
             --card-bg: #161b22;
             --accent-blue: #58a6ff;
             --accent-green: #3fb950;
             --accent-red: #f85149;
+            --accent-yellow: #d29922;
+            --accent-purple: #bc8cff;
             --text-main: #c9d1d9;
+            --text-dim: #8b949e;
+            --border: #30363d;
         }
 
         body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
             background: var(--bg-color); 
             color: var(--text-main); 
             margin: 0; 
@@ -30,194 +40,307 @@
             align-items: center;
         }
 
-        h1 {
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-size: 1.5rem;
+        /* --- Header & Nav Section --- */
+        .header-container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 30px;
-            color: var(--accent-blue);
-            border-bottom: 2px solid #30363d;
-            padding-bottom: 10px;
+            gap: 15px;
         }
 
+        .title-group h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+        }
+
+        .title-group p {
+            margin: 5px 0 0;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        select, .btn-download {
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid var(--border);
+            outline: none;
+        }
+
+        select {
+            background: var(--card-bg);
+            color: white;
+        }
+
+        select:focus { border-color: var(--accent-blue); }
+
+        .btn-download {
+            background: var(--accent-green);
+            color: #fff;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-download:hover { opacity: 0.8; transform: translateY(-2px); }
+
+        /* --- Status Indicator --- */
         .status-box { 
             width: 100%; 
-            max-width: 900px;
-            padding: 20px; 
+            max-width: 1000px;
+            padding: 15px; 
             border-radius: 12px; 
-            font-size: 1.2rem; 
+            font-size: 1rem; 
             font-weight: 800; 
             margin-bottom: 25px; 
-            transition: all 0.5s ease;
-            box-sizing: border-box;
-            border: 1px solid #30363d;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: 0.5s;
         }
 
-        .normal { background: rgba(63, 185, 80, 0.15); color: var(--accent-green); border-color: var(--accent-green); }
-        .warning { background: rgba(248, 81, 73, 0.2); color: var(--accent-red); border-color: var(--accent-red); animation: pulse-red 1.5s infinite; }
+        .normal { background: rgba(63, 185, 80, 0.1); color: var(--accent-green); border-color: var(--accent-green); }
+        .warning { background: rgba(248, 81, 73, 0.15); color: var(--accent-red); border-color: var(--accent-red); animation: pulse 1.5s infinite; }
 
-        @keyframes pulse-red {
+        @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.4); }
-            70% { box-shadow: 0 0 0 15px rgba(248, 81, 73, 0); }
+            70% { box-shadow: 0 0 0 10px rgba(248, 81, 73, 0); }
             100% { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0); }
         }
 
-        .container { 
+        /* --- Stats Grid --- */
+        .stats-grid { 
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px; 
             width: 100%;
-            max-width: 940px; 
+            max-width: 1000px; 
         }
 
         .card { 
             background: var(--card-bg); 
-            padding: 25px; 
-            border-radius: 16px; 
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-            border: 1px solid #30363d;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 4px; height: 100%;
-        }
-
-        .card-hr::before { background: var(--accent-green); }
-        .card-pitch::before { background: #f1c40f; }
-        .card-roll::before { background: #9b59b6; }
-
-        .unit { font-size: 0.85rem; color: #8b949e; text-transform: uppercase; font-weight: 600; }
-        .value { font-size: 3rem; font-family: 'Courier New', monospace; font-weight: bold; margin: 10px 0; color: #f0f6fc; }
-
-        .chart-container { 
-            background: var(--card-bg); 
             padding: 20px; 
             border-radius: 16px; 
+            border: 1px solid var(--border);
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .card-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700; }
+        .card-value { 
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: 3.2rem; 
+            font-weight: 700; 
+            margin: 10px 0; 
+        }
+        
+        .c-bpm { color: var(--accent-green); }
+        .c-pitch { color: var(--accent-yellow); }
+        .c-roll { color: var(--accent-purple); }
+
+        /* --- Chart Section --- */
+        .chart-wrapper { 
+            background: var(--card-bg); 
+            padding: 25px; 
+            border-radius: 16px; 
             width: 100%; 
-            max-width: 900px; 
+            max-width: 1000px; 
             margin-top: 25px; 
-            border: 1px solid #30363d;
+            border: 1px solid var(--border);
             box-sizing: border-box;
+            height: 450px;
+        }
+
+        @media (max-width: 600px) {
+            .header-container { flex-direction: column; text-align: center; }
+            .controls { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
 
-    <h1>System Monitoring <span style="color: #fff;">v1.0</span></h1>
+    <div class="header-container">
+        <div class="title-group">
+            <h1>Driver Monitor <span style="color:#fff">PRO</span></h1>
+            <p>Real-time telemetry & safety analysis</p>
+        </div>
+        <div class="controls">
+            <select id="graphSelect" onchange="changeGraph()">
+                <option value="bpm">Heart Rate (BPM)</option>
+                <option value="pitch">Posture: Pitch</option>
+                <option value="roll">Posture: Roll</option>
+            </select>
+            <button class="btn-download" onclick="downloadCSV()">
+                <span>📥</span> Download CSV
+            </button>
+        </div>
+    </div>
     
-    <div id="statusIndicator" class="status-box normal">KONDISI: TERHUBUNG</div>
+    <div id="statusIndicator" class="status-box normal">SYSTEM READY: WAITING FOR DATA</div>
 
-    <div class="container">
-        <div class="card card-hr">
-            <div class="unit">Heart Rate</div>
-            <div id="bpmVal" class="value">--</div>
-            <div class="unit">Beats Per Minute</div>
+    <div class="stats-grid">
+        <div class="card">
+            <div class="card-label">Heart Rate</div>
+            <div id="bpmVal" class="card-value c-bpm">--</div>
+            <div class="card-label">BPM</div>
         </div>
-        <div class="card card-pitch">
-            <div class="unit">Orientation (Pitch)</div>
-            <div id="pitchVal" class="value">0.0</div>
-            <div class="unit">Degrees</div>
+        <div class="card">
+            <div class="card-label">Pitch Orientation</div>
+            <div id="pitchVal" class="card-value c-pitch">0.0</div>
+            <div class="card-label">Degrees (°)</div>
         </div>
-        <div class="card card-roll">
-            <div class="unit">Orientation (Roll)</div>
-            <div id="rollVal" class="value">0.0</div>
-            <div class="unit">Degrees</div>
+        <div class="card">
+            <div class="card-label">Roll Orientation</div>
+            <div id="rollVal" class="card-value c-roll">0.0</div>
+            <div class="card-label">Degrees (°)</div>
         </div>
     </div>
 
-    <div class="chart-container">
-        <canvas id="bpmChart"></canvas>
+    <div class="chart-wrapper">
+        <canvas id="mainChart"></canvas>
     </div>
 
     <script>
-        // Konfigurasi Firebase
+        // --- KONFIGURASI FIREBASE ---
         const firebaseConfig = {
             databaseURL: "https://driver-monitoring-5cce0-default-rtdb.asia-southeast1.firebasedatabase.app/"
         };
-        
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref("monitoring");
 
-        // Inisialisasi Grafik dengan peningkatan visual
-        const ctx = document.getElementById('bpmChart').getContext('2d');
-        const bpmChart = new Chart(ctx, {
+        // --- DATA STORAGE ---
+        let timeLabels = [];
+        let dataStore = {
+            bpm: [],
+            pitch: [],
+            roll: []
+        };
+
+        const configMap = {
+            bpm: { label: 'Heart Rate (BPM)', color: '#3fb950', min: 40, max: 150 },
+            pitch: { label: 'Pitch Angle (°)', color: '#d29922', min: -90, max: 90 },
+            roll: { label: 'Roll Angle (°)', color: '#bc8cff', min: -90, max: 90 }
+        };
+
+        // --- INISIALISASI CHART ---
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        const mainChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: [],
+                labels: timeLabels,
                 datasets: [{
-                    label: 'Detak Jantung (BPM)',
-                    data: [],
-                    borderColor: '#3fb950',
-                    backgroundColor: 'rgba(63, 185, 80, 0.1)',
+                    label: configMap.bpm.label,
+                    data: dataStore.bpm,
+                    borderColor: configMap.bpm.color,
+                    backgroundColor: 'rgba(63, 185, 80, 0.05)',
                     borderWidth: 3,
                     fill: true,
                     tension: 0.4,
-                    pointRadius: 2,
-                    pointBackgroundColor: '#3fb950'
+                    pointRadius: 3,
+                    pointHoverRadius: 6
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { labels: { color: '#c9d1d9' } }
+                    legend: { labels: { color: '#8b949e', font: { size: 12, weight: '600' } } },
+                    tooltip: { backgroundColor: '#161b22', titleColor: '#58a6ff', bodyColor: '#fff', borderColor: '#30363d', borderWidth: 1 }
                 },
                 scales: {
-                    x: { 
-                        grid: { color: '#30363d' },
-                        ticks: { color: '#8b949e', maxTicksLimit: 10 } 
-                    },
-                    y: { 
-                        min: 40, 
-                        max: 160,
-                        grid: { color: '#30363d' },
-                        ticks: { color: '#8b949e' }
-                    }
+                    x: { grid: { color: '#21262d' }, ticks: { color: '#8b949e' } },
+                    y: { min: 40, max: 150, grid: { color: '#21262d' }, ticks: { color: '#8b949e' } }
                 }
             }
         });
 
-        // Ambil data Real-time
+        // --- FUNGSI INTERAKSI ---
+        function changeGraph() {
+            const selected = document.getElementById('graphSelect').value;
+            const config = configMap[selected];
+
+            mainChart.data.datasets[0].label = config.label;
+            mainChart.data.datasets[0].borderColor = config.color;
+            mainChart.data.datasets[0].data = dataStore[selected];
+            mainChart.data.datasets[0].backgroundColor = config.color + '1A'; // 1A = low opacity hex
+            
+            mainChart.options.scales.y.min = config.min;
+            mainChart.options.scales.y.max = config.max;
+            mainChart.update();
+        }
+
+        function downloadCSV() {
+            if (timeLabels.length === 0) {
+                alert("Belum ada data untuk diunduh!");
+                return;
+            }
+            let csvContent = "data:text/csv;charset=utf-8,Waktu,Heart Rate (BPM),Pitch (Deg),Roll (Deg)\n";
+            timeLabels.forEach((label, i) => {
+                csvContent += `${label},${dataStore.bpm[i]},${dataStore.pitch[i]},${dataStore.roll[i]}\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Log_Driver_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // --- REAL-TIME LISTENER ---
         db.on("value", (snapshot) => {
             const data = snapshot.val();
             if(!data) return;
 
-            // Update Angka
+            // Update UI Numerik
             document.getElementById("bpmVal").innerText = data.bpm || 0;
             document.getElementById("pitchVal").innerText = parseFloat(data.pitch || 0).toFixed(1);
             document.getElementById("rollVal").innerText = parseFloat(data.roll || 0).toFixed(1);
 
-            // Update Status Drowsy
+            // Update Safety Status
             const statusBox = document.getElementById("statusIndicator");
             const isDrowsy = (data.drowsy === true || data.drowsy === "true");
-
             if (isDrowsy) {
-                statusBox.innerText = "WARNING: PENGEMUDI MENGANTUK!";
+                statusBox.innerText = "🚨 WARNING: PENGEMUDI TERINDIKASI MENGANTUK!";
                 statusBox.className = "status-box warning";
             } else {
-                statusBox.innerText = "KONDISI: PENGEMUDI NORMAL";
+                statusBox.innerText = "✅ KONDISI: PENGEMUDI NORMAL / TERJAGA";
                 statusBox.className = "status-box normal";
             }
 
-            // Update Grafik berdasarkan waktu sistem
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            // Update Data Storage
+            const timeStr = new Date().toLocaleTimeString('id-ID', { hour12: false, hour:'2-digit', minute:'2-digit', second:'2-digit' });
             
-            // Tambahkan data baru
-            bpmChart.data.labels.push(timeStr);
-            bpmChart.data.datasets[0].data.push(data.bpm);
+            timeLabels.push(timeStr);
+            dataStore.bpm.push(data.bpm);
+            dataStore.pitch.push(data.pitch);
+            dataStore.roll.push(data.roll);
 
-            // Batasi tampilan hanya 20 data terakhir agar tidak berat
-            if (bpmChart.data.labels.length > 20) {
-                bpmChart.data.labels.shift();
-                bpmChart.data.datasets[0].data.shift();
+            // Simpan riwayat (batas 30 data agar tetap ringan di browser)
+            if (timeLabels.length > 30) {
+                timeLabels.shift();
+                dataStore.bpm.shift();
+                dataStore.pitch.shift();
+                dataStore.roll.shift();
             }
             
-            bpmChart.update('none'); // 'none' untuk performa lebih cepat tanpa animasi re-scale berlebih
+            mainChart.update('none'); 
         });
     </script>
 </body>
