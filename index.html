@@ -130,7 +130,6 @@
     async function hubungkanSerial() {
         if ("serial" in navigator) {
             try {
-                // Meminta izin user memilih Port COM Arduino
                 port = await navigator.serial.requestPort();
                 await port.open({ baudRate: 115200 });
                 
@@ -139,15 +138,11 @@
                 document.getElementById("sliderBPM").disabled = false;
                 document.getElementById("btnBaseline").disabled = false;
 
-                // Siapkan jalur kirim data (Writer)
                 const textEncoder = new TextEncoderStream();
                 textEncoder.stream.pipeTo(port.writable);
                 writer = textEncoder.writable.getWriter();
 
-                // Jalankan fungsi pengirim data detak jantung awal
                 updateBPM(currentBPM);
-
-                // Jalankan loop pembacaan data masuk (Reader) dari Arduino
                 bacaDataMasuk();
 
             } catch (err) {
@@ -158,7 +153,6 @@
         }
     }
 
-    // Fungsi Kirim Nilai BPM Real-time (Format: H[nilai]\n)
     async function updateBPM(nilai) {
         currentBPM = nilai;
         document.getElementById("lblBPM").innerText = nilai;
@@ -169,7 +163,6 @@
         }
     }
 
-    // Fungsi Mengunci dan Kirim Nilai Baseline (Format: B[nilai]\n)
     async function setBaseline() {
         document.getElementById("valBaseline").innerText = currentBPM + " BPM";
         if (writer) {
@@ -177,7 +170,6 @@
         }
     }
 
-    // Fungsi Membaca Data JSON yang Dikirim Arduino via USB
     async function bacaDataMasuk() {
         const textDecoder = new TextDecoderStream();
         port.readable.pipeTo(textDecoder.writable);
@@ -191,37 +183,17 @@
             }
             if (value) {
                 inputBuffer += value;
-                // Pecah data berdasarkan baris baru (\n)
-                let baris = inputBuffer.split("\n");
-                inputBuffer = baris.pop(); // Simpan sisa string yang belum lengkap
+                
+                // Pisahkan string berdasarkan baris baru (\r\n atau \n)
+                let baris = inputBuffer.split(/\r?\n/);
+                
+                // Ambil elemen terakhir (yang mungkin belum lengkap) kembali ke buffer
+                inputBuffer = baris.pop(); 
 
                 for (let dataBaris of baris) {
                     dataBaris = dataBaris.trim();
+                    
+                    // Deteksi string JSON murni
                     if (dataBaris.startsWith("{") && dataBaris.endsWith("}")) {
                         try {
-                            // Parse teks string menjadi object JSON Javascript
-                            let json = JSON.parse(dataBaris);
-                            
-                            // Update tampilan ke HTML
-                            document.getElementById("valPitch").innerText = json.pitch + "°";
-                            document.getElementById("valRoll").innerText = json.roll + "°";
-                            
-                            let statusBox = document.getElementById("boxStatus");
-                            statusBox.innerText = json.status;
-                            
-                            if (json.status === "BAHAYA") {
-                                statusBox.className = "status-box bahaya";
-                            } else {
-                                statusBox.className = "status-box normal";
-                            }
-                        } catch (e) {
-                            // Abaikan jika data JSON terpotong di tengah jalan
-                        }
-                    }
-                }
-            }
-        }
-    }
-</script>
-</body>
-</html>
+                            let json = JSON.parse(
