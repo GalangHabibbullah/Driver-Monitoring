@@ -12,7 +12,7 @@
   --txt:#e6edf3;--muted:#8b949e;
 }
 body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
-header{padding:18px 20px 0;border-bottom:1px solid var(--bdr);display:flex;justify-content:between;align-items:center;}
+header{padding:18px 20px 0;border-bottom:1px solid var(--bdr);}
 header h1{font-size:17px;font-weight:600;letter-spacing:.5px;color:var(--cyan)}
 header p{font-size:11px;color:var(--muted);margin:2px 0 14px}
 main{padding:16px;max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
@@ -36,7 +36,6 @@ main{padding:16px;max-width:560px;margin:0 auto;display:flex;flex-direction:colu
 .card.c-red .card-val{color:var(--red)}
 .card.c-yel .card-val{font-size:18px;color:var(--yellow)}
 
-/* Penambahan Style Kontrol GUI Simulasi */
 .simulator-section {background:var(--surf); border:1px solid var(--bdr); padding:15px; border-radius:10px;}
 .simulator-section h3 {font-size:13px; color:var(--cyan); margin-bottom:10px; text-transform:uppercase;}
 .control-group {display:flex; flex-direction:column; gap:8px; margin-bottom:12px;}
@@ -45,8 +44,8 @@ main{padding:16px;max-width:560px;margin:0 auto;display:flex;flex-direction:colu
 input[type=range] {flex:1; accent-color:var(--cyan);}
 
 .actions{display:flex;gap:10px}
-.btn{flex:1;padding:9px;border-radius:8px;font-size:12px;font-weight:600;
-  text-align:center;cursor:pointer;border:1px solid var(--bdr);text-decoration:none;transition:.2s}
+.btn{flex:1;padding:12px;border-radius:8px;font-size:12px;font-weight:600;
+  text-align:center;cursor:pointer;border:1px solid var(--bdr);text-decoration:none;transition:.2s; display:block; width:100%;}
 .btn:hover{opacity:.8}
 .btn-connect{background:var(--cyan);color:#0d1117;border-color:var(--cyan)}
 .btn-baseline{background:transparent;color:var(--yellow);border-color:var(--yellow)}
@@ -56,12 +55,12 @@ input[type=range] {flex:1; accent-color:var(--cyan);}
 <body>
 <header>
   <div>
-    <h1>DRIVER MONITOR (SIMULATOR)</h1>
+    <h1>DRIVER MONITOR (SERIAL SLIDER)</h1>
     <p>Monitoring kantuk via Web Serial API</p>
   </div>
 </header>
 <main>
-  <button id="btn-conn" class="btn btn-connect" onclick="connectSerial()">HUBUNGKAN KE ARDUINO</button>
+  <button id="btn-conn" class="btn btn-connect">HUBUNGKAN KE ARDUINO</button>
 
   <div id="banner">
     <div id="dot"></div>
@@ -113,8 +112,16 @@ let writer;
 let baselineBPM = 0;
 let currentSimBPM = 80;
 
+// Menghubungkan event klik secara aman lewat listener browser
+document.getElementById('btn-conn').addEventListener('click', connectSerial);
+
 // 1. Fungsi Koneksi ke Arduino via Web Serial API
 async function connectSerial() {
+  if (!("serial" in navigator)) {
+    alert("Browser Anda tidak mendukung Web Serial API. Gunakan Google Chrome atau Microsoft Edge di PC/Laptop.");
+    return;
+  }
+
   try {
     port = await navigator.serial.requestPort();
     await port.open({ baudRate: 115200 });
@@ -138,7 +145,7 @@ async function connectSerial() {
     readSerial();
   } catch (error) {
     console.error("Gagal membuka port serial:", error);
-    alert("Gagal terhubung ke perangkat. Pastikan port COM benar dan browser mendukung Web Serial API.");
+    alert("Koneksi dibatalkan atau gagal terhubung ke perangkat.");
   }
 }
 
@@ -178,7 +185,6 @@ async function readSerial() {
       if (done) break;
       if (value) {
         buffer += value;
-        // Memastikan pembacaan berbasis baris demi baris JSON (\n)
         let lines = buffer.split('\n');
         buffer = lines.pop(); // simpan sisa data yang belum lengkap
 
@@ -212,7 +218,7 @@ async function readSerial() {
               'Diperbarui: ' + new Date().toLocaleTimeString('id-ID');
               
           } catch(e) {
-            // Abaikan jika ada potongan data JSON yang korup di awal stream
+            // Abaikan error parse jika string data belum utuh
           }
         }
       }
