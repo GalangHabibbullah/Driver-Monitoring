@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Driver Monitor Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@500;600;700&display=swap');
 
@@ -28,7 +29,7 @@
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Diubah agar bisa scroll jika layar penuh */
     padding: 20px;
   }
 
@@ -37,7 +38,7 @@
     max-width: 600px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 15px;
   }
 
   /* --- Glass Panel Effect --- */
@@ -47,30 +48,30 @@
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
     border-radius: 16px;
-    padding: 20px;
+    padding: 15px 20px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   }
 
   /* --- Header & Institution Branding --- */
-  header { text-align: center; margin-bottom: 5px; }
+  header { text-align: center; margin-bottom: 0px; }
   
   .inst-header {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     padding-bottom: 12px;
     border-bottom: 1px solid rgba(0, 229, 255, 0.15);
   }
   .inst-logo {
-    width: 45px;
+    width: 40px;
     height: auto;
     filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
   }
   .inst-text {
     font-family: 'Orbitron', sans-serif;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-main);
     letter-spacing: 1.5px;
     text-transform: uppercase;
@@ -79,29 +80,29 @@
   }
   .inst-text span {
     display: block;
-    font-size: 10px;
+    font-size: 9px;
     color: var(--cyan);
   }
 
   header h1 {
     font-family: 'Orbitron', sans-serif;
-    font-size: 22px;
+    font-size: 20px;
     color: var(--cyan);
     letter-spacing: 2px;
     text-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
   }
-  header p { font-size: 14px; color: var(--text-muted); margin-top: 5px; letter-spacing: 1px; }
+  header p { font-size: 13px; color: var(--text-muted); margin-top: 3px; letter-spacing: 1px; }
 
   /* --- Connect Button --- */
   .btn-connect {
     width: 100%;
-    padding: 16px;
+    padding: 14px;
     border-radius: 12px;
     background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(0, 229, 255, 0));
     border: 1px solid var(--cyan);
     color: var(--cyan);
     font-family: 'Orbitron', sans-serif;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     letter-spacing: 1.5px;
     cursor: pointer;
@@ -118,10 +119,6 @@
     display: flex;
     align-items: center;
     gap: 15px;
-    padding: 16px 20px;
-    border-radius: 12px;
-    background: rgba(0, 250, 154, 0.05);
-    border: 1px solid rgba(0, 250, 154, 0.3);
     transition: 0.4s ease;
   }
   #dot {
@@ -133,10 +130,9 @@
     flex-shrink: 0;
     transition: 0.4s;
   }
-  #st-label { font-size: 18px; font-weight: 700; letter-spacing: 1px; }
-  #st-sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+  #st-label { font-size: 16px; font-weight: 700; letter-spacing: 1px; }
+  #st-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
-  /* DANGER STATE */
   #banner.danger {
     background: rgba(255, 51, 102, 0.1);
     border-color: var(--red);
@@ -156,12 +152,11 @@
     background: rgba(16, 24, 43, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 12px;
-    padding: 20px 10px;
+    padding: 15px 10px;
     text-align: center;
     position: relative;
     overflow: hidden;
   }
-  /* Card glowing top borders */
   .card::before {
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
     background: var(--cyan);
@@ -169,48 +164,70 @@
   .card.c-red::before { background: var(--red); box-shadow: 0 0 10px var(--red); }
   .card.c-yel::before { background: var(--yellow); box-shadow: 0 0 10px var(--yellow); }
 
-  .card-lbl { font-size: 12px; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
-  .card-val { font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 5px; }
-  .card-unit { font-size: 12px; color: rgba(255,255,255,0.4); }
+  .card-lbl { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
+  .card-val { font-family: 'Orbitron', sans-serif; font-size: 26px; font-weight: 700; line-height: 1; margin-bottom: 5px; }
+  .card-unit { font-size: 11px; color: rgba(255,255,255,0.4); }
   
   .card.c-red .card-val { color: var(--red); text-shadow: 0 0 10px rgba(255, 51, 102, 0.4); }
-  .card.c-yel .card-val { font-size: 24px; color: var(--yellow); text-shadow: 0 0 10px rgba(255, 204, 0, 0.3); }
-  #base-val { font-size: 11px; color: var(--cyan); margin-top: 8px; font-weight: 600; letter-spacing: 0.5px; }
+  .card.c-yel .card-val { font-size: 20px; color: var(--yellow); text-shadow: 0 0 10px rgba(255, 204, 0, 0.3); }
+  #base-val { font-size: 10px; color: var(--cyan); margin-top: 8px; font-weight: 600; letter-spacing: 0.5px; }
+
+  /* --- Actuator/Alert Cards --- */
+  .actuators { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+  .act-card {
+    text-align: center;
+    padding: 12px;
+    border: 1px solid var(--glass-border);
+    transition: 0.3s;
+  }
+  .act-title { font-size: 11px; color: var(--text-muted); letter-spacing: 1.5px; margin-bottom: 5px; }
+  .act-state { font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: bold; color: var(--green); text-shadow: 0 0 8px rgba(0, 250, 154, 0.4); }
+  
+  /* State saat bahaya */
+  .act-card.active {
+    border-color: var(--red);
+    background: rgba(255, 51, 102, 0.1);
+    box-shadow: 0 0 15px rgba(255, 51, 102, 0.3);
+  }
+  .act-card.active .act-state {
+    color: var(--red);
+    text-shadow: 0 0 10px rgba(255, 51, 102, 0.6);
+    animation: blinkText 0.8s infinite alternate;
+  }
+  @keyframes blinkText { from { opacity: 1; } to { opacity: 0.4; } }
 
   /* --- Simulator Section --- */
   .simulator-section h3 {
-    font-size: 14px; color: var(--cyan); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(0, 229, 255, 0.2); padding-bottom: 8px;
+    font-size: 13px; color: var(--cyan); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(0, 229, 255, 0.2); padding-bottom: 6px;
   }
-  .control-group label { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; display: block; }
-  .slider-container { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+  .control-group label { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: block; }
+  .slider-container { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
   
-  /* Styling Slider agar futuristik */
   input[type=range] { flex: 1; -webkit-appearance: none; background: transparent; }
-  input[type=range]::-webkit-slider-runnable-track {
-    width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px;
-  }
+  input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; }
   input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%;
-    background: var(--cyan); box-shadow: 0 0 10px var(--cyan); margin-top: -7px; cursor: pointer; transition: 0.2s;
+    -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%;
+    background: var(--cyan); box-shadow: 0 0 10px var(--cyan); margin-top: -6px; cursor: pointer; transition: 0.2s;
   }
   input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
-  
-  #slider-txt { font-family: 'Orbitron', sans-serif; font-size: 18px; color: var(--cyan); min-width: 35px; display: inline-block; text-align: right; }
+  #slider-txt { font-family: 'Orbitron', sans-serif; font-size: 16px; color: var(--cyan); min-width: 30px; display: inline-block; text-align: right; }
 
-  /* Baseline Button */
   .btn-baseline {
-    width: 100%; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 700; letter-spacing: 1px;
+    width: 100%; padding: 10px; border-radius: 8px; font-size: 12px; font-weight: 700; letter-spacing: 1px;
     background: transparent; color: var(--yellow); border: 1px solid var(--yellow); cursor: pointer; transition: 0.3s;
   }
   .btn-baseline:hover:not([disabled]) { background: rgba(255, 204, 0, 0.1); box-shadow: 0 0 15px rgba(255, 204, 0, 0.3); }
   .btn-baseline:disabled { opacity: 0.5; cursor: not-allowed; border-color: var(--text-muted); color: var(--text-muted); }
 
+  /* --- Chart Section --- */
+  .chart-panel { height: 220px; padding: 10px 15px; position: relative; }
+  canvas { width: 100% !important; height: 100% !important; }
+  #chart-error { display:none; text-align:center; font-size:12px; color:var(--red); padding-top: 80px; }
+
   #last-up { font-size: 11px; color: var(--text-muted); text-align: center; letter-spacing: 1px; margin-top: -5px; }
 
-  /* Responsiveness */
   @media (max-width: 480px) {
     .cards { grid-template-columns: 1fr; }
-    .card { padding: 15px; }
     .card::before { width: 3px; height: 100%; top: 0; left: 0; right: auto; }
   }
 </style>
@@ -223,10 +240,9 @@
       <img src="https://upload.wikimedia.org/wikipedia/id/4/44/Logo_PENS.png" alt="Logo PENS" class="inst-logo">
       <div class="inst-text">
         Politeknik Elektronika<br>Negeri Surabaya
-        <span>Innovation for a Better Future</span>
+        <span>Bridge to the future</span>
       </div>
     </div>
-
     <h1>DRIVER MONITORING SIMULATION</h1>
     <p>Galang Habibbullah</p>
   </header>
@@ -260,8 +276,19 @@
     </div>
   </div>
 
+  <div class="actuators">
+    <div class="glass-panel act-card" id="card-buzzer">
+      <div class="act-title">ALARM BUZZER</div>
+      <div class="act-state" id="state-buzzer">MATI</div>
+    </div>
+    <div class="glass-panel act-card" id="card-vibro">
+      <div class="act-title">MOTOR VIBRATOR</div>
+      <div class="act-state" id="state-vibro">MATI</div>
+    </div>
+  </div>
+
   <div class="simulator-section glass-panel">
-    <h3>Panel Override Jantung</h3>
+    <h3>Detak jantung</h3>
     <div class="control-group">
       <label>Kalibrasi Input BPM Manual:</label>
       <div class="slider-container">
@@ -272,24 +299,86 @@
     <button id="btn-base" class="btn-baseline" disabled onclick="setBaseline()">TETAPKAN SEBAGAI BASELINE</button>
   </div>
 
+  <div class="glass-panel chart-panel">
+    <canvas id="liveChart"></canvas>
+    <div id="chart-error">Grafik Gagal Dimuat (Cek Internet Anda)</div>
+  </div>
+
   <div id="last-up">Sistem Siaga.</div>
 </div>
 
 <script>
-// =========================================================================
-// KODE JAVASCRIPT TETAP SAMA AGAR KONEKSI SERIAL ARDUINO TETAP AMAN
-// =========================================================================
-
 let port;
 let writer;
 let baselineBPM = 0;
 let currentSimBPM = 80;
+let chartObj = null;
 
-document.getElementById('btn-conn').addEventListener('click', connectSerial);
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById('btn-conn').addEventListener('click', connectSerial);
+  initChart();
+});
+
+// --- Fungsi Inisialisasi Grafik ---
+function initChart() {
+  try {
+    if (typeof Chart !== 'undefined') {
+      const ctx = document.getElementById('liveChart').getContext('2d');
+      const maxDataPoints = 25; // Jumlah titik data yang tampil di layar
+      
+      chartObj = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: Array(maxDataPoints).fill(''),
+          datasets: [
+            { label: 'BPM', borderColor: '#ff3366', backgroundColor: 'rgba(255, 51, 102, 0.1)', data: Array(maxDataPoints).fill(null), tension: 0.4, borderWidth: 2, pointRadius: 0, fill: true },
+            { label: 'Pitch', borderColor: '#00e5ff', data: Array(maxDataPoints).fill(null), tension: 0.4, borderWidth: 2, pointRadius: 0 },
+            { label: 'Roll', borderColor: '#ffcc00', data: Array(maxDataPoints).fill(null), tension: 0.4, borderWidth: 2, pointRadius: 0 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 0 }, // Matikan animasi agar update serial tidak patah-patah
+          plugins: { 
+            legend: { labels: { color: '#e0fbfc', font: { family: 'Rajdhani', size: 12 } } }
+          },
+          scales: { 
+            x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#8ea8c3', font: { size: 10 } } }, 
+            y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#8ea8c3', font: { size: 10 } } } 
+          }
+        }
+      });
+    } else {
+      document.getElementById('liveChart').style.display = 'none';
+      document.getElementById('chart-error').style.display = 'block';
+    }
+  } catch (e) {
+    console.error("Grafik error:", e);
+  }
+}
+
+// --- Fungsi Memperbarui Grafik ---
+function updateChartData(bpm, pitch, roll) {
+  if (!chartObj) return;
+  
+  const timeNow = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  
+  chartObj.data.labels.push(timeNow);
+  chartObj.data.labels.shift();
+  chartObj.data.datasets[0].data.push(bpm);
+  chartObj.data.datasets[0].data.shift();
+  chartObj.data.datasets[1].data.push(pitch);
+  chartObj.data.datasets[1].data.shift();
+  chartObj.data.datasets[2].data.push(roll);
+  chartObj.data.datasets[2].data.shift();
+  
+  chartObj.update();
+}
 
 async function connectSerial() {
   if (!("serial" in navigator)) {
-    alert("Browser Anda tidak mendukung Web Serial API. Gunakan Google Chrome atau Microsoft Edge di PC/Laptop.");
+    alert("Browser Anda tidak mendukung Web Serial API. Gunakan Google Chrome/Edge di PC.");
     return;
   }
 
@@ -315,7 +404,7 @@ async function connectSerial() {
     readSerial();
   } catch (error) {
     console.error("Gagal membuka port serial:", error);
-    alert("Koneksi dibatalkan atau gagal terhubung ke perangkat.");
+    alert("Koneksi dibatalkan atau gagal terhubung.");
   }
 }
 
@@ -359,30 +448,54 @@ async function readSerial() {
           try {
             const data = JSON.parse(line.trim());
             
+            // Perbarui Angka Utama
             document.getElementById('pitch').textContent = data.pitch;
             document.getElementById('roll').textContent = data.roll;
             
+            // Variabel UI
             const bn = document.getElementById('banner');
             const sl = document.getElementById('st-label');
             const ss = document.getElementById('st-sub');
             
+            const cardBuzzer = document.getElementById('card-buzzer');
+            const stateBuzzer = document.getElementById('state-buzzer');
+            const cardVibro = document.getElementById('card-vibro');
+            const stateVibro = document.getElementById('state-vibro');
+            
             if(data.status === 'BAHAYA'){
+              // Aktifkan Banner Merah
               bn.className = 'glass-panel danger';
               sl.style.color = 'var(--red)';
               sl.textContent = 'BAHAYA — MENGANTUK';
               ss.textContent = 'Buzzer Menyala! Segera Berhenti!';
+              
+              // Aktifkan Kotak Buzzer & Vibrator
+              cardBuzzer.classList.add('active');
+              stateBuzzer.textContent = "AKTIF";
+              cardVibro.classList.add('active');
+              stateVibro.textContent = "AKTIF";
             } else {
+              // Kembalikan ke Normal
               bn.className = 'glass-panel';
               sl.style.color = 'var(--green)';
               sl.textContent = 'NORMAL';
               ss.textContent = 'Pengemudi dalam kondisi baik';
+              
+              // Matikan Kotak Buzzer & Vibrator
+              cardBuzzer.classList.remove('active');
+              stateBuzzer.textContent = "MATI";
+              cardVibro.classList.remove('active');
+              stateVibro.textContent = "MATI";
             }
+            
+            // Perbarui Grafik Real-Time
+            updateChartData(currentSimBPM, parseFloat(data.pitch), parseFloat(data.roll));
             
             document.getElementById('last-up').textContent = 
               'UPDATE TERAKHIR: ' + new Date().toLocaleTimeString('id-ID');
               
           } catch(e) {
-            // Abaikan error parse jika string data belum utuh
+            // Abaikan error parse JSON
           }
         }
       }
