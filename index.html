@@ -1,388 +1,469 @@
 <!DOCTYPE html>
+
 <html lang="id">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Safety Driver Simulation</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body {
-            background-color: #e6ebf0;
-            color: #333;
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
+<meta charset="UTF-8">
 
-        .container {
-            width: 100%;
-            max-width: 500px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-        h2 { font-size: 20px; font-weight: 600; color: #1a1a1a; margin-bottom: -5px; }
+<title>Driver Monitor (Serial Mode)</title>
 
-        /* --- Neumorphic Card Base --- */
-        .neo-card {
-            background: #e6ebf0;
-            border-radius: 20px;
-            box-shadow: 8px 8px 16px #c4c9cd, -8px -8px 16px #ffffff;
-            padding: 20px;
-            position: relative;
-        }
+<style>
 
-        /* --- Connect Button --- */
-        .btn-connect {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 15px;
-            background: #e6ebf0;
-            box-shadow: 5px 5px 10px #c4c9cd, -5px -5px 10px #ffffff;
-            color: #0066cc;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .btn-connect:active { box-shadow: inset 5px 5px 10px #c4c9cd, inset -5px -5px 10px #ffffff; }
-        .btn-connect.connected { color: #3fb950; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-        /* --- Status Banner --- */
-        #banner {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px 20px;
-            border-radius: 15px;
-            background: #e6ebf0;
-            box-shadow: inset 4px 4px 8px #c4c9cd, inset -4px -4px 8px #ffffff;
-            transition: 0.3s;
-        }
-        #banner i { font-size: 30px; color: #8b949e; }
-        .status-text { display: flex; flex-direction: column; }
-        .status-title { font-size: 16px; font-weight: 700; color: #555; }
-        .status-sub { font-size: 12px; color: #777; }
+:root{
 
-        /* Mode Bahaya */
-        #banner.danger { background: #ffebe9; box-shadow: 0 0 15px rgba(248, 81, 73, 0.4); border: 1px solid #ffcccc; }
-        #banner.danger i { color: #cf222e; }
-        #banner.danger .status-title { color: #cf222e; }
-        #banner.danger .status-sub { color: #82071e; }
+  --bg:#0d1117;--surf:#161b22;--bdr:#30363d;
 
-        /* --- Heart Rate Card --- */
-        .hr-header { display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: 600; }
-        .hr-header i { color: #cf222e; font-size: 24px; }
-        .hr-body { display: flex; justify-content: center; align-items: baseline; gap: 10px; margin: 20px 0; }
-        .hr-val { font-size: 64px; font-weight: 700; color: #111; line-height: 1; }
-        .hr-unit { font-size: 24px; font-weight: 600; color: #111; }
+  --cyan:#00e5ff;--green:#3fb950;--red:#f85149;--yellow:#e3b341;
 
-        .btn-baseline {
-            display: block; margin: 0 auto; padding: 6px 16px; border: none; border-radius: 20px;
-            background: #e6ebf0; box-shadow: 3px 3px 6px #c4c9cd, -3px -3px 6px #ffffff;
-            font-size: 12px; font-weight: 600; color: #333; cursor: pointer;
-        }
-        .btn-baseline:active { box-shadow: inset 3px 3px 6px #c4c9cd, inset -3px -3px 6px #ffffff; }
+  --txt:#e6edf3;--muted:#8b949e;
 
-        /* --- Pitch & Roll Mini Cards --- */
-        .sensor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .mini-card { text-align: center; padding: 15px; }
-        .mini-lbl { font-size: 14px; font-weight: 600; color: #555; margin-bottom: 8px; }
-        .mini-val { font-size: 28px; font-weight: 700; color: #e3b341; line-height: 1; }
-        .mini-unit { font-size: 11px; color: #777; margin-top: 5px; }
+}
 
-        /* --- Slider Section --- */
-        .slider-section h3 { font-size: 14px; margin-bottom: 10px; font-weight: 600; }
-        .slider-container { display: flex; align-items: center; background: #e6ebf0; padding: 10px 15px; border-radius: 20px; box-shadow: inset 4px 4px 8px #c4c9cd, inset -4px -4px 8px #ffffff; }
-        input[type=range] { flex: 1; -webkit-appearance: none; background: transparent; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: #c4c9cd; border-radius: 3px; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2); margin-top: -7px; cursor: pointer; }
+body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
 
-        /* --- Alert Cards --- */
-        .alerts { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .alert-card { text-align: center; padding: 15px; transition: 0.3s; }
-        .alert-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 15px; }
-        .alert-icon { font-size: 40px; color: #cf222e; margin-bottom: 15px; }
-        .alert-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; background: #e6ebf0; box-shadow: 2px 2px 5px #c4c9cd, -2px -2px 5px #ffffff; color: #555; transition: 0.3s; }
-        
-        .alert-card.active { box-shadow: 0 0 20px rgba(248, 81, 73, 0.2); border: 1px solid rgba(248, 81, 73, 0.3); }
-        .alert-card.active .alert-icon { animation: shake 0.5s infinite; }
-        .alert-card.active .alert-badge { color: #cf222e; background: #ffebe9; box-shadow: none; }
+header{padding:18px 20px 0;border-bottom:1px solid var(--bdr);}
 
-        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-2px) rotate(-5deg); } 50% { transform: translateX(2px) rotate(5deg); } 75% { transform: translateX(-2px) rotate(-5deg); } 100% { transform: translateX(0); } }
+header h1{font-size:17px;font-weight:600;letter-spacing:.5px;color:var(--cyan)}
 
-        /* --- Chart Card --- */
-        .chart-card { padding: 10px; }
-        .chart-card h3 { font-size: 14px; margin: 5px 0 15px 10px; font-weight: 600; }
-        canvas { width: 100% !important; height: 200px !important; }
-    </style>
+header p{font-size:11px;color:var(--muted);margin:2px 0 14px}
+
+main{padding:16px;max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+
+
+
+#banner{display:flex;align-items:center;gap:10px;padding:11px 14px;
+
+  border-radius:10px;background:#0f2419;border:1px solid var(--green);transition:.3s}
+
+#banner.danger{background:#2d1111;border-color:var(--red)}
+
+#dot{width:9px;height:9px;border-radius:50%;background:var(--green);flex-shrink:0;transition:.3s}
+
+#banner.danger #dot{background:var(--red)}
+
+#st-label{font-size:13px;font-weight:600}
+
+#st-sub{font-size:11px;color:var(--muted);margin-top:1px}
+
+
+
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+
+.card{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;
+
+  padding:12px 10px;text-align:center;border-top:3px solid var(--cyan)}
+
+.card.c-red{border-top-color:var(--red)}
+
+.card.c-yel{border-top-color:var(--yellow)}
+
+.card-lbl{font-size:9px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
+
+.card-val{font-size:26px;font-weight:700;line-height:1}
+
+.card-unit{font-size:10px;color:var(--muted);margin-top:3px}
+
+.card.c-red .card-val{color:var(--red)}
+
+.card.c-yel .card-val{font-size:18px;color:var(--yellow)}
+
+
+
+.simulator-section {background:var(--surf); border:1px solid var(--bdr); padding:15px; border-radius:10px;}
+
+.simulator-section h3 {font-size:13px; color:var(--cyan); margin-bottom:10px; text-transform:uppercase;}
+
+.control-group {display:flex; flex-direction:column; gap:8px; margin-bottom:12px;}
+
+.control-group label {font-size:11px; color:var(--muted);}
+
+.slider-container {display:flex; align-items:center; gap:10px;}
+
+input[type=range] {flex:1; accent-color:var(--cyan);}
+
+
+
+.actions{display:flex;gap:10px}
+
+.btn{flex:1;padding:12px;border-radius:8px;font-size:12px;font-weight:600;
+
+  text-align:center;cursor:pointer;border:1px solid var(--bdr);text-decoration:none;transition:.2s; display:block; width:100%;}
+
+.btn:hover{opacity:.8}
+
+.btn-connect{background:var(--cyan);color:#0d1117;border-color:var(--cyan)}
+
+.btn-baseline{background:transparent;color:var(--yellow);border-color:var(--yellow)}
+
+#last-up{font-size:10px;color:var(--muted);text-align:center}
+
+</style>
+
 </head>
+
 <body>
 
-<div class="container">
-    <button id="btn-conn" class="btn-connect"><i class="fas fa-usb"></i> Hubungkan Perangkat Serial</button>
+<header>
 
-    <h2>Safety Driver Simulation</h2>
+  <div>
 
-    <div id="banner">
-        <i class="far fa-face-smile" id="status-icon"></i>
-        <div class="status-text">
-            <span class="status-title" id="st-label">Sistem Siap</span>
-            <span class="status-sub" id="st-sub">Menunggu koneksi...</span>
-        </div>
+    <h1>DRIVER MONITOR (SERIAL SLIDER)</h1>
+
+    <p>Monitoring kantuk via Web Serial API</p>
+
+  </div>
+
+</header>
+
+<main>
+
+  <button id="btn-conn" class="btn btn-connect">HUBUNGKAN KE ARDUINO</button>
+
+
+
+  <div id="banner">
+
+    <div id="dot"></div>
+
+    <div>
+
+      <div id="st-label" style="color:var(--green)">DISCONNECTED</div>
+
+      <div id="st-sub">Silakan klik tombol hubungkan di atas</div>
+
     </div>
 
-    <div class="neo-card">
-        <div class="hr-header">
-            <span>Heart Rate</span>
-            <i class="fas fa-heartbeat"></i>
-        </div>
-        <div class="hr-body">
-            <span class="hr-val" id="bpm">80</span>
-            <span class="hr-unit">BPM</span>
-        </div>
-        <button id="btn-base" class="btn-baseline" disabled onclick="setBaseline()">Set Baseline</button>
-        <div style="text-align: center; margin-top: 8px; font-size: 11px; color: #777;" id="base-val">Base: Belum diatur</div>
+  </div>
+
+
+
+  <div class="cards">
+
+    <div class="card c-red">
+
+      <div class="card-lbl">Heart Rate</div>
+
+      <div class="card-val" id="bpm">--</div>
+
+      <div class="card-unit">BPM</div>
+
+      <div id="base-val" style="font-size:9px; color:var(--muted); margin-top:5px;">Base: --</div>
+
     </div>
 
-    <div class="sensor-grid">
-        <div class="neo-card mini-card">
-            <div class="mini-lbl">Pitch</div>
-            <div class="mini-val" id="val-pitch">--</div>
-            <div class="mini-unit">derajat</div>
-        </div>
-        <div class="neo-card mini-card">
-            <div class="mini-lbl">Roll</div>
-            <div class="mini-val" id="val-roll">--</div>
-            <div class="mini-unit">derajat</div>
-        </div>
+    <div class="card c-yel">
+
+      <div class="card-lbl">Pitch</div>
+
+      <div class="card-val" id="pitch">--</div>
+
+      <div class="card-unit">derajat</div>
+
     </div>
 
-    <div class="slider-section">
-        <h3>Atur BPM</h3>
-        <div class="slider-container">
-            <input type="range" id="bpm-slider" min="40" max="140" value="80" disabled oninput="updateSliderVal(this.value)">
-        </div>
+    <div class="card c-yel">
+
+      <div class="card-lbl">Roll</div>
+
+      <div class="card-val" id="roll">--</div>
+
+      <div class="card-unit">derajat</div>
+
     </div>
 
-    <div class="alerts">
-        <div class="neo-card alert-card" id="card-vib">
-            <h4>Vibration Alert</h4>
-            <div class="alert-icon"><i class="fas fa-dharmachakra"></i></div> 
-            <span class="alert-badge" id="badge-vib">Vibration: Mati</span>
-        </div>
-        <div class="neo-card alert-card" id="card-buz">
-            <h4>Buzzer Alert</h4>
-            <div class="alert-icon"><i class="fas fa-volume-up"></i></div>
-            <span class="alert-badge" id="badge-buz">Buzzer: Mati</span>
-        </div>
+  </div>
+
+
+
+  <div class="simulator-section">
+
+    <h3>Panel Simulasi Detak Jantung</h3>
+
+    <div class="control-group">
+
+      <label>Geser untuk Ubah Detak Jantung Saat Ini:</label>
+
+      <div class="slider-container">
+
+        <input type="range" id="bpm-slider" min="40" max="140" value="80" disabled oninput="updateSliderVal(this.value)">
+
+        <span id="slider-txt" style="font-weight:bold; min-width:30px;">80</span> BPM
+
+      </div>
+
     </div>
 
-    <div class="neo-card chart-card">
-        <h3>Grafik</h3>
-        <canvas id="myChart"></canvas>
-        <div id="chart-error" style="display:none; text-align:center; font-size:12px; color:#cf222e; padding:20px 0;">Grafik Gagal Dimuat (Butuh Internet)</div>
+    <div class="actions">
+
+      <button id="btn-base" class="btn btn-baseline" disabled onclick="setBaseline()">JADIKAN SEBAGAI BASELINE</button>
+
     </div>
-</div>
+
+  </div>
+
+
+
+  <div id="last-up">Menunggu koneksi serial...</div>
+
+</main>
+
+
 
 <script>
-// --- VARIABEL GLOBAL ---
+
 let port;
+
 let writer;
+
 let baselineBPM = 0;
+
 let currentSimBPM = 80;
-let chartObj = null;
 
-// --- INISIALISASI KEAMANAN TINGGI ---
-// Pastikan tombol connect aktif seketika setelah halaman di-load
-document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById('btn-conn').addEventListener('click', connectSerial);
-    initChartSafe();
-});
 
-// --- FUNGSI CHART TAHAN BANTING ---
-function initChartSafe() {
-    try {
-        if (typeof Chart !== 'undefined') {
-            const ctx = document.getElementById('myChart').getContext('2d');
-            const MAX_DATA_POINTS = 20;
-            
-            chartObj = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: Array(MAX_DATA_POINTS).fill(''),
-                    datasets: [
-                        { label: 'BPM', borderColor: '#cf222e', data: Array(MAX_DATA_POINTS).fill(null), tension: 0.4, borderWidth: 2, pointRadius: 0 },
-                        { label: 'Pitch', borderColor: '#3fb950', data: Array(MAX_DATA_POINTS).fill(null), tension: 0.4, borderWidth: 2, pointRadius: 0 },
-                        { label: 'Roll', borderColor: '#0066cc', data: Array(MAX_DATA_POINTS).fill(null), tension: 0.4, borderWidth: 2, pointRadius: 0 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: false,
-                    plugins: { legend: { display: false } },
-                    scales: { x: { grid: { display: true } }, y: { grid: { display: true } } }
-                }
-            });
-        } else {
-            // Jika CDN diblokir atau offline, tampilkan teks merah tanpa merusak sistem lain
-            document.getElementById('myChart').style.display = 'none';
-            document.getElementById('chart-error').style.display = 'block';
-        }
-    } catch (e) {
-        console.error("Error memuat grafik:", e);
-    }
-}
 
-function updateChartData(bpm, pitch, roll) {
-    if (!chartObj) return; // Abaikan proses ini jika grafik offline
-    
-    const timeNow = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    
-    chartObj.data.labels.push(timeNow);
-    chartObj.data.labels.shift();
-    chartObj.data.datasets[0].data.push(bpm);
-    chartObj.data.datasets[0].data.shift();
-    chartObj.data.datasets[1].data.push(pitch);
-    chartObj.data.datasets[1].data.shift();
-    chartObj.data.datasets[2].data.push(roll);
-    chartObj.data.datasets[2].data.shift();
-    
-    chartObj.update();
-}
+// Menghubungkan event klik secara aman lewat listener browser
 
-// --- LOGIKA WEB SERIAL ---
+document.getElementById('btn-conn').addEventListener('click', connectSerial);
+
+
+
+// 1. Fungsi Koneksi ke Arduino via Web Serial API
+
 async function connectSerial() {
-    if (!("serial" in navigator)) {
-        alert("Browser tidak mendukung. Gunakan Chrome/Edge di PC.");
-        return;
-    }
 
-    try {
-        port = await navigator.serial.requestPort();
-        await port.open({ baudRate: 115200 });
-        
-        writer = port.writable.getWriter();
-        
-        // Aktifkan Kontrol UI
-        document.getElementById('bpm-slider').disabled = false;
-        document.getElementById('btn-base').disabled = false;
-        
-        const btnConn = document.getElementById('btn-conn');
-        btnConn.innerHTML = '<i class="fas fa-check-circle"></i> Terhubung ke Arduino';
-        btnConn.classList.add('connected');
-        
-        document.getElementById('st-label').textContent = "Aman";
-        document.getElementById('st-sub').textContent = "Pengendara fokus";
+  if (!("serial" in navigator)) {
 
-        sendSimulatedBPM();
-        readSerial();
-    } catch (error) {
-        console.error("Koneksi dibatalkan atau error:", error);
-    }
+    alert("Browser Anda tidak mendukung Web Serial API. Gunakan Google Chrome atau Microsoft Edge di PC/Laptop.");
+
+    return;
+
+  }
+
+
+
+  try {
+
+    port = await navigator.serial.requestPort();
+
+    await port.open({ baudRate: 115200 });
+
+    
+
+    writer = port.writable.getWriter();
+
+    
+
+    // Aktifkan kontrol GUI setelah sukses terhubung
+
+    document.getElementById('bpm-slider').disabled = false;
+
+    document.getElementById('btn-base').disabled = false;
+
+    document.getElementById('btn-conn').textContent = "TERHUBUNG";
+
+    document.getElementById('btn-conn').style.background = "var(--green)";
+
+    document.getElementById('btn-conn').style.borderColor = "var(--green)";
+
+    
+
+    document.getElementById('st-label').textContent = "NORMAL";
+
+    document.getElementById('st-label').style.color = "var(--green)";
+
+    document.getElementById('st-sub').textContent = "Sistem berjalan baik";
+
+
+
+    // Kirim data awal
+
+    sendSimulatedBPM();
+
+    // Mulai membaca data dari Arduino
+
+    readSerial();
+
+  } catch (error) {
+
+    console.error("Gagal membuka port serial:", error);
+
+    alert("Koneksi dibatalkan atau gagal terhubung ke perangkat.");
+
+  }
+
 }
+
+
+
+// 2. Fungsi Update nilai Slider GUI & Kirim ke Arduino
 
 function updateSliderVal(val) {
-    currentSimBPM = parseInt(val);
-    document.getElementById('bpm').textContent = val;
-    sendSimulatedBPM();
+
+  currentSimBPM = parseInt(val);
+
+  document.getElementById('slider-txt').textContent = val;
+
+  document.getElementById('bpm').textContent = val;
+
+  sendSimulatedBPM();
+
 }
+
+
+
+// 3. Fungsi Menentukan Nilai Baseline BPM
 
 function setBaseline() {
-    baselineBPM = currentSimBPM;
-    document.getElementById('base-val').textContent = "Base: " + baselineBPM + " BPM";
-    sendSimulatedBPM();
+
+  baselineBPM = currentSimBPM;
+
+  document.getElementById('base-val').textContent = "Base: " + baselineBPM + " BPM";
+
+  sendSimulatedBPM();
+
 }
+
+
+
+// 4. Fungsi Kirim Data ke Arduino via Serial ("BPM,BASELINE\n")
 
 async function sendSimulatedBPM() {
-    if (writer) {
-        const dataToSend = `${currentSimBPM},${baselineBPM}\n`;
-        await writer.write(new TextEncoder().encode(dataToSend));
-    }
+
+  if (writer) {
+
+    const dataToSend = `${currentSimBPM},${baselineBPM}\n`;
+
+    await writer.write(new TextEncoder().encode(dataToSend));
+
+  }
+
 }
+
+
+
+// 5. Fungsi Membaca Data Masuk (Pitch, Roll, Status) dari Arduino
 
 async function readSerial() {
-    const decoder = new TextDecoderStream();
-    const inputClosed = port.readable.pipeTo(decoder.writable);
-    const reader = decoder.readable.getReader();
 
-    try {
-        let buffer = '';
-        while (true) {
-            const { value, done } = await reader.read();
-            if (done) break;
-            if (value) {
-                buffer += value;
-                let lines = buffer.split('\n');
-                buffer = lines.pop(); // Tahan data JSON yang terpotong
+  const decoder = new TextDecoderStream();
 
-                for(let line of lines) {
-                    if(line.trim() === "") continue;
-                    try {
-                        const data = JSON.parse(line.trim());
-                        
-                        // 1. Update Pitch & Roll
-                        document.getElementById('val-pitch').textContent = data.pitch;
-                        document.getElementById('val-roll').textContent = data.roll;
-                        
-                        // 2. Update Status Visual
-                        const bn = document.getElementById('banner');
-                        const icon = document.getElementById('status-icon');
-                        const sl = document.getElementById('st-label');
-                        const ss = document.getElementById('st-sub');
-                        
-                        const cardVib = document.getElementById('card-vib');
-                        const cardBuz = document.getElementById('card-buz');
-                        const bdgVib = document.getElementById('badge-vib');
-                        const bdgBuz = document.getElementById('badge-buz');
+  const inputClosed = port.readable.pipeTo(decoder.writable);
 
-                        if(data.status === 'BAHAYA'){
-                            bn.className = 'danger';
-                            icon.className = 'far fa-face-frown';
-                            sl.textContent = 'Mengantuk';
-                            ss.textContent = 'Pengendara Mengantuk';
+  const reader = decoder.readable.getReader();
 
-                            cardVib.classList.add('active');
-                            cardBuz.classList.add('active');
-                            bdgVib.textContent = 'Vibration: Aktif';
-                            bdgBuz.textContent = 'Buzzer: Aktif';
-                        } else {
-                            bn.className = '';
-                            icon.className = 'far fa-face-smile';
-                            sl.textContent = 'Aman';
-                            ss.textContent = 'Pengendara fokus';
 
-                            cardVib.classList.remove('active');
-                            cardBuz.classList.remove('active');
-                            bdgVib.textContent = 'Vibration: Mati';
-                            bdgBuz.textContent = 'Buzzer: Mati';
-                        }
 
-                        // 3. Update Grafik
-                        updateChartData(currentSimBPM, data.pitch, data.roll);
-                        
-                    } catch(e) {
-                        // Abaikan error parse jika string belum utuh, sistem akan menggabungkannya nanti
-                    }
-                }
+  try {
+
+    let buffer = '';
+
+    while (true) {
+
+      const { value, done } = await reader.read();
+
+      if (done) break;
+
+      if (value) {
+
+        buffer += value;
+
+        let lines = buffer.split('\n');
+
+        buffer = lines.pop(); // simpan sisa data yang belum lengkap
+
+
+
+        for(let line of lines) {
+
+          if(line.trim() === "") continue;
+
+          try {
+
+            const data = JSON.parse(line.trim());
+
+            
+
+            // Update Tampilan Angka Sensor
+
+            document.getElementById('pitch').textContent = data.pitch;
+
+            document.getElementById('roll').textContent = data.roll;
+
+            
+
+            // Update Tampilan Banner Status Bahaya/Normal
+
+            const bn = document.getElementById('banner');
+
+            const sl = document.getElementById('st-label');
+
+            const ss = document.getElementById('st-sub');
+
+            
+
+            if(data.status === 'BAHAYA'){
+
+              bn.className = 'danger';
+
+              sl.style.color = 'var(--red)';
+
+              sl.textContent = 'BAHAYA — MENGANTUK';
+
+              ss.textContent = 'Buzzer Menyala! Segera Berhenti!';
+
+            } else {
+
+              bn.className = '';
+
+              sl.style.color = 'var(--green)';
+
+              sl.textContent = 'NORMAL';
+
+              ss.textContent = 'Pengemudi dalam kondisi baik';
+
             }
+
+            
+
+            document.getElementById('last-up').textContent = 
+
+              'Diperbarui: ' + new Date().toLocaleTimeString('id-ID');
+
+              
+
+          } catch(e) {
+
+            // Abaikan error parse jika string data belum utuh
+
+          }
+
         }
-    } catch (error) {
-        console.error("Terputus:", error);
-    } finally {
-        reader.releaseLock();
+
+      }
+
     }
+
+  } catch (error) {
+
+    console.error("Error saat membaca Serial:", error);
+
+    document.getElementById('last-up').textContent = 'Koneksi Terputus';
+
+  } finally {
+
+    reader.releaseLock();
+
+  }
+
 }
+
 </script>
+
 </body>
+
 </html>
