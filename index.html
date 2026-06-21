@@ -29,12 +29,7 @@
             gap: 20px;
         }
 
-        h2 {
-            font-size: 20px;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: -5px;
-        }
+        h2 { font-size: 20px; font-weight: 600; color: #1a1a1a; margin-bottom: -5px; }
 
         /* --- Neumorphic Card Base --- */
         .neo-card {
@@ -59,12 +54,8 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        .btn-connect:active {
-            box-shadow: inset 5px 5px 10px #c4c9cd, inset -5px -5px 10px #ffffff;
-        }
-        .btn-connect.connected {
-            color: #3fb950;
-        }
+        .btn-connect:active { box-shadow: inset 5px 5px 10px #c4c9cd, inset -5px -5px 10px #ffffff; }
+        .btn-connect.connected { color: #3fb950; }
 
         /* --- Status Banner --- */
         #banner {
@@ -83,143 +74,56 @@
         .status-sub { font-size: 12px; color: #777; }
 
         /* Mode Bahaya */
-        #banner.danger {
-            background: #ffebe9;
-            box-shadow: 0 0 15px rgba(248, 81, 73, 0.4);
-            border: 1px solid #ffcccc;
-        }
+        #banner.danger { background: #ffebe9; box-shadow: 0 0 15px rgba(248, 81, 73, 0.4); border: 1px solid #ffcccc; }
         #banner.danger i { color: #cf222e; }
         #banner.danger .status-title { color: #cf222e; }
         #banner.danger .status-sub { color: #82071e; }
 
         /* --- Heart Rate Card --- */
-        .hr-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 16px;
-            font-weight: 600;
-        }
+        .hr-header { display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: 600; }
         .hr-header i { color: #cf222e; font-size: 24px; }
-        
-        .hr-body {
-            display: flex;
-            justify-content: center;
-            align-items: baseline;
-            gap: 10px;
-            margin: 20px 0;
-        }
+        .hr-body { display: flex; justify-content: center; align-items: baseline; gap: 10px; margin: 20px 0; }
         .hr-val { font-size: 64px; font-weight: 700; color: #111; line-height: 1; }
         .hr-unit { font-size: 24px; font-weight: 600; color: #111; }
 
         .btn-baseline {
-            display: block;
-            margin: 0 auto;
-            padding: 6px 16px;
-            border: none;
-            border-radius: 20px;
-            background: #e6ebf0;
-            box-shadow: 3px 3px 6px #c4c9cd, -3px -3px 6px #ffffff;
-            font-size: 12px;
-            font-weight: 600;
-            color: #333;
-            cursor: pointer;
+            display: block; margin: 0 auto; padding: 6px 16px; border: none; border-radius: 20px;
+            background: #e6ebf0; box-shadow: 3px 3px 6px #c4c9cd, -3px -3px 6px #ffffff;
+            font-size: 12px; font-weight: 600; color: #333; cursor: pointer;
         }
         .btn-baseline:active { box-shadow: inset 3px 3px 6px #c4c9cd, inset -3px -3px 6px #ffffff; }
 
         /* --- Pitch & Roll Mini Cards --- */
-        .sensor-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .mini-card {
-            text-align: center;
-            padding: 15px;
-        }
+        .sensor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .mini-card { text-align: center; padding: 15px; }
         .mini-lbl { font-size: 14px; font-weight: 600; color: #555; margin-bottom: 8px; }
         .mini-val { font-size: 28px; font-weight: 700; color: #e3b341; line-height: 1; }
         .mini-unit { font-size: 11px; color: #777; margin-top: 5px; }
 
         /* --- Slider Section --- */
         .slider-section h3 { font-size: 14px; margin-bottom: 10px; font-weight: 600; }
-        .slider-container {
-            display: flex;
-            align-items: center;
-            background: #e6ebf0;
-            padding: 10px 15px;
-            border-radius: 20px;
-            box-shadow: inset 4px 4px 8px #c4c9cd, inset -4px -4px 8px #ffffff;
-        }
-        input[type=range] {
-            flex: 1;
-            -webkit-appearance: none;
-            background: transparent;
-        }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 6px;
-            background: #c4c9cd;
-            border-radius: 3px;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 20px;
-            width: 20px;
-            border-radius: 50%;
-            background: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            margin-top: -7px;
-            cursor: pointer;
-        }
+        .slider-container { display: flex; align-items: center; background: #e6ebf0; padding: 10px 15px; border-radius: 20px; box-shadow: inset 4px 4px 8px #c4c9cd, inset -4px -4px 8px #ffffff; }
+        input[type=range] { flex: 1; -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: #c4c9cd; border-radius: 3px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2); margin-top: -7px; cursor: pointer; }
 
-        /* --- Alert Cards (Vibration & Buzzer) --- */
-        .alerts {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .alert-card {
-            text-align: center;
-            padding: 15px;
-            transition: 0.3s;
-        }
+        /* --- Alert Cards --- */
+        .alerts { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .alert-card { text-align: center; padding: 15px; transition: 0.3s; }
         .alert-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 15px; }
         .alert-icon { font-size: 40px; color: #cf222e; margin-bottom: 15px; }
+        .alert-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; background: #e6ebf0; box-shadow: 2px 2px 5px #c4c9cd, -2px -2px 5px #ffffff; color: #555; transition: 0.3s; }
         
-        .alert-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            background: #e6ebf0;
-            box-shadow: 2px 2px 5px #c4c9cd, -2px -2px 5px #ffffff;
-            color: #555;
-            transition: 0.3s;
-        }
-        
-        /* State Aktif untuk Alert Card */
-        .alert-card.active {
-            box-shadow: 0 0 20px rgba(248, 81, 73, 0.2);
-            border: 1px solid rgba(248, 81, 73, 0.3);
-        }
+        .alert-card.active { box-shadow: 0 0 20px rgba(248, 81, 73, 0.2); border: 1px solid rgba(248, 81, 73, 0.3); }
         .alert-card.active .alert-icon { animation: shake 0.5s infinite; }
         .alert-card.active .alert-badge { color: #cf222e; background: #ffebe9; box-shadow: none; }
 
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-2px) rotate(-5deg); }
-            50% { transform: translateX(2px) rotate(5deg); }
-            75% { transform: translateX(-2px) rotate(-5deg); }
-            100% { transform: translateX(0); }
-        }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-2px) rotate(-5deg); } 50% { transform: translateX(2px) rotate(5deg); } 75% { transform: translateX(-2px) rotate(-5deg); } 100% { transform: translateX(0); } }
 
         /* --- Chart Card --- */
         .chart-card { padding: 10px; }
         .chart-card h3 { font-size: 14px; margin: 5px 0 15px 10px; font-weight: 600; }
         canvas { width: 100% !important; height: 200px !important; }
-
     </style>
 </head>
 <body>
@@ -286,65 +190,81 @@
     <div class="neo-card chart-card">
         <h3>Grafik</h3>
         <canvas id="myChart"></canvas>
+        <div id="chart-error" style="display:none; text-align:center; font-size:12px; color:#cf222e; padding:20px 0;">Grafik Gagal Dimuat (Butuh Internet)</div>
     </div>
 </div>
 
 <script>
+// --- VARIABEL GLOBAL ---
 let port;
 let writer;
 let baselineBPM = 0;
 let currentSimBPM = 80;
+let chartObj = null;
 
-// === SETUP CHART.JS ===
-const ctx = document.getElementById('myChart').getContext('2d');
-const MAX_DATA_POINTS = 20;
-
-const chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: Array(MAX_DATA_POINTS).fill(''),
-        datasets: [
-            { label: 'BPM', borderColor: '#cf222e', data: Array(MAX_DATA_POINTS).fill(null), tension: 0.4, borderWidth: 2, pointRadius: 0 },
-            { label: 'Pitch', borderColor: '#3fb950', data: Array(MAX_DATA_POINTS).fill(null), tension: 0.4, borderWidth: 2, pointRadius: 0 },
-            { label: 'Roll', borderColor: '#0066cc', data: Array(MAX_DATA_POINTS).fill(null), tension: 0.4, borderWidth: 2, pointRadius: 0 }
-        ]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: false,
-        plugins: { legend: { display: false } },
-        scales: {
-            x: { grid: { display: true } },
-            y: { grid: { display: true } }
-        }
-    }
+// --- INISIALISASI KEAMANAN TINGGI ---
+// Pastikan tombol connect aktif seketika setelah halaman di-load
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById('btn-conn').addEventListener('click', connectSerial);
+    initChartSafe();
 });
 
-function updateChartData(bpm, pitch, roll) {
-    const timeNow = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    
-    chart.data.labels.push(timeNow);
-    chart.data.labels.shift();
-
-    chart.data.datasets[0].data.push(bpm);
-    chart.data.datasets[0].data.shift();
-
-    chart.data.datasets[1].data.push(pitch);
-    chart.data.datasets[1].data.shift();
-
-    chart.data.datasets[2].data.push(roll);
-    chart.data.datasets[2].data.shift();
-
-    chart.update();
+// --- FUNGSI CHART TAHAN BANTING ---
+function initChartSafe() {
+    try {
+        if (typeof Chart !== 'undefined') {
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const MAX_DATA_POINTS = 20;
+            
+            chartObj = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array(MAX_DATA_POINTS).fill(''),
+                    datasets: [
+                        { label: 'BPM', borderColor: '#cf222e', data: Array(MAX_DATA_POINTS).fill(null), tension: 0.4, borderWidth: 2, pointRadius: 0 },
+                        { label: 'Pitch', borderColor: '#3fb950', data: Array(MAX_DATA_POINTS).fill(null), tension: 0.4, borderWidth: 2, pointRadius: 0 },
+                        { label: 'Roll', borderColor: '#0066cc', data: Array(MAX_DATA_POINTS).fill(null), tension: 0.4, borderWidth: 2, pointRadius: 0 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { grid: { display: true } }, y: { grid: { display: true } } }
+                }
+            });
+        } else {
+            // Jika CDN diblokir atau offline, tampilkan teks merah tanpa merusak sistem lain
+            document.getElementById('myChart').style.display = 'none';
+            document.getElementById('chart-error').style.display = 'block';
+        }
+    } catch (e) {
+        console.error("Error memuat grafik:", e);
+    }
 }
 
-// === LOGIKA WEB SERIAL ===
-document.getElementById('btn-conn').addEventListener('click', connectSerial);
+function updateChartData(bpm, pitch, roll) {
+    if (!chartObj) return; // Abaikan proses ini jika grafik offline
+    
+    const timeNow = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    
+    chartObj.data.labels.push(timeNow);
+    chartObj.data.labels.shift();
+    chartObj.data.datasets[0].data.push(bpm);
+    chartObj.data.datasets[0].data.shift();
+    chartObj.data.datasets[1].data.push(pitch);
+    chartObj.data.datasets[1].data.shift();
+    chartObj.data.datasets[2].data.push(roll);
+    chartObj.data.datasets[2].data.shift();
+    
+    chartObj.update();
+}
 
+// --- LOGIKA WEB SERIAL ---
 async function connectSerial() {
     if (!("serial" in navigator)) {
-        alert("Browser Anda tidak mendukung Web Serial API. Gunakan Chrome/Edge di PC.");
+        alert("Browser tidak mendukung. Gunakan Chrome/Edge di PC.");
         return;
     }
 
@@ -368,7 +288,7 @@ async function connectSerial() {
         sendSimulatedBPM();
         readSerial();
     } catch (error) {
-        console.error("Gagal membuka port serial:", error);
+        console.error("Koneksi dibatalkan atau error:", error);
     }
 }
 
@@ -404,24 +324,23 @@ async function readSerial() {
             if (value) {
                 buffer += value;
                 let lines = buffer.split('\n');
-                buffer = lines.pop();
+                buffer = lines.pop(); // Tahan data JSON yang terpotong
 
                 for(let line of lines) {
                     if(line.trim() === "") continue;
                     try {
                         const data = JSON.parse(line.trim());
                         
-                        // 1. Update Tampilan Angka Pitch & Roll (FUNGSI BARU DITAMBAHKAN KEMBALI)
+                        // 1. Update Pitch & Roll
                         document.getElementById('val-pitch').textContent = data.pitch;
                         document.getElementById('val-roll').textContent = data.roll;
                         
-                        // 2. Update Tampilan Banner Status
+                        // 2. Update Status Visual
                         const bn = document.getElementById('banner');
                         const icon = document.getElementById('status-icon');
                         const sl = document.getElementById('st-label');
                         const ss = document.getElementById('st-sub');
                         
-                        // 3. Update Alert Cards
                         const cardVib = document.getElementById('card-vib');
                         const cardBuz = document.getElementById('card-buz');
                         const bdgVib = document.getElementById('badge-vib');
@@ -433,7 +352,6 @@ async function readSerial() {
                             sl.textContent = 'Mengantuk';
                             ss.textContent = 'Pengendara Mengantuk';
 
-                            // Aktifkan visual Buzzer & Vibration
                             cardVib.classList.add('active');
                             cardBuz.classList.add('active');
                             bdgVib.textContent = 'Vibration: Aktif';
@@ -444,24 +362,23 @@ async function readSerial() {
                             sl.textContent = 'Aman';
                             ss.textContent = 'Pengendara fokus';
 
-                            // Matikan visual Buzzer & Vibration
                             cardVib.classList.remove('active');
                             cardBuz.classList.remove('active');
                             bdgVib.textContent = 'Vibration: Mati';
                             bdgBuz.textContent = 'Buzzer: Mati';
                         }
 
-                        // 4. Update Chart
+                        // 3. Update Grafik
                         updateChartData(currentSimBPM, data.pitch, data.roll);
                         
                     } catch(e) {
-                        // Abaikan error parse
+                        // Abaikan error parse jika string belum utuh, sistem akan menggabungkannya nanti
                     }
                 }
             }
         }
     } catch (error) {
-        console.error("Error membaca Serial:", error);
+        console.error("Terputus:", error);
     } finally {
         reader.releaseLock();
     }
