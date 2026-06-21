@@ -6,229 +6,144 @@
 <title>Driver Monitor Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg-dark: #050b14;
-    --glass-bg: rgba(16, 24, 43, 0.6);
-    --glass-border: rgba(0, 229, 255, 0.2);
-    --cyan: #00e5ff;
-    --green: #00fa9a;
-    --red: #ff3366;
-    --yellow: #ffcc00;
-    --text-main: #e0fbfc;
-    --text-muted: #8ea8c3;
-  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: radial-gradient(circle at 50% 0%, #112240 0%, var(--bg-dark) 80%);
-    color: var(--text-main);
-    font-family: 'Rajdhani', sans-serif;
+    background-color: #f0f2f5; /* Warna latar bersih */
+    color: #333;
+    font-family: 'Inter', sans-serif;
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Diubah agar bisa scroll jika layar penuh */
+    align-items: flex-start;
     padding: 20px;
   }
 
   .dashboard-container {
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
     display: flex;
     flex-direction: column;
     gap: 15px;
   }
 
-  /* --- Glass Panel Effect --- */
-  .glass-panel {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
+  /* --- Neumorphic Card Style --- */
+  .neo-card {
+    background: #ffffff;
+    border-radius: 12px;
     padding: 15px 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e1e4e8;
   }
 
   /* --- Header & Institution Branding --- */
-  header { text-align: center; margin-bottom: 0px; }
+  header { text-align: center; margin-bottom: 5px; }
   
   .inst-header {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
-    margin-bottom: 12px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(0, 229, 255, 0.15);
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e1e4e8;
   }
-  .inst-logo {
-    width: 40px;
-    height: auto;
-    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
-  }
+  .inst-logo { width: 50px; height: auto; }
   .inst-text {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 12px;
-    color: var(--text-main);
-    letter-spacing: 1.5px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #24292e;
     text-transform: uppercase;
     text-align: left;
-    line-height: 1.2;
+    line-height: 1.3;
   }
-  .inst-text span {
-    display: block;
-    font-size: 9px;
-    color: var(--cyan);
-  }
+  .inst-text span { display: block; font-size: 11px; font-weight: 400; color: #586069; }
 
-  header h1 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 20px;
-    color: var(--cyan);
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
-  }
-  header p { font-size: 13px; color: var(--text-muted); margin-top: 3px; letter-spacing: 1px; }
+  header h1 { font-size: 22px; color: #24292e; font-weight: 700; }
+  header p { font-size: 14px; color: #586069; margin-top: 5px; }
 
   /* --- Connect Button --- */
   .btn-connect {
     width: 100%;
     padding: 14px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(0, 229, 255, 0));
-    border: 1px solid var(--cyan);
-    color: var(--cyan);
-    font-family: 'Orbitron', sans-serif;
-    font-size: 13px;
+    border-radius: 10px;
+    background: #f6f8fa;
+    border: 1px solid #d1d5da;
+    color: #0366d6;
+    font-size: 14px;
     font-weight: 700;
-    letter-spacing: 1.5px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+    transition: all 0.2s ease;
   }
-  .btn-connect:hover {
-    background: rgba(0, 229, 255, 0.2);
-    box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
-  }
+  .btn-connect:hover { background: #e1e4e8; }
+  .btn-connect.active { background: #e6ffed; border-color: #34d058; color: #22863a; }
 
   /* --- Status Banner --- */
   #banner {
     display: flex;
     align-items: center;
     gap: 15px;
-    transition: 0.4s ease;
+    background: #e6ffed;
+    border-color: #34d058;
   }
   #dot {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 12px var(--green);
-    flex-shrink: 0;
-    transition: 0.4s;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #28a745; transition: 0.3s;
   }
-  #st-label { font-size: 16px; font-weight: 700; letter-spacing: 1px; }
-  #st-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  #st-label { font-size: 16px; font-weight: 700; color: #22863a; }
+  #st-sub { font-size: 12px; color: #586069; margin-top: 2px; }
 
-  #banner.danger {
-    background: rgba(255, 51, 102, 0.1);
-    border-color: var(--red);
-    box-shadow: inset 0 0 20px rgba(255, 51, 102, 0.2);
-    animation: pulseDanger 1.5s infinite;
-  }
-  #banner.danger #dot { background: var(--red); box-shadow: 0 0 15px var(--red); }
-  @keyframes pulseDanger {
-    0% { box-shadow: inset 0 0 20px rgba(255, 51, 102, 0.2); }
-    50% { box-shadow: inset 0 0 40px rgba(255, 51, 102, 0.5), 0 0 20px rgba(255, 51, 102, 0.3); }
-    100% { box-shadow: inset 0 0 20px rgba(255, 51, 102, 0.2); }
-  }
+  #banner.danger { background: #ffeef0; border-color: #f97583; }
+  #banner.danger #dot { background: #cb2431; animation: blink 1s infinite; }
+  #banner.danger #st-label { color: #cb2431; }
+  @keyframes blink { 50% { opacity: 0.3; } }
 
   /* --- Data Cards --- */
   .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-  .card {
-    background: rgba(16, 24, 43, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 15px 10px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: var(--cyan);
-  }
-  .card.c-red::before { background: var(--red); box-shadow: 0 0 10px var(--red); }
-  .card.c-yel::before { background: var(--yellow); box-shadow: 0 0 10px var(--yellow); }
+  .card { text-align: center; padding: 15px 10px; border-top: 4px solid #0366d6; }
+  .card.c-red { border-top-color: #cb2431; }
+  .card.c-blu { border-top-color: #0366d6; }
+  .card.c-grn { border-top-color: #28a745; }
 
-  .card-lbl { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
-  .card-val { font-family: 'Orbitron', sans-serif; font-size: 26px; font-weight: 700; line-height: 1; margin-bottom: 5px; }
-  .card-unit { font-size: 11px; color: rgba(255,255,255,0.4); }
-  
-  .card.c-red .card-val { color: var(--red); text-shadow: 0 0 10px rgba(255, 51, 102, 0.4); }
-  .card.c-yel .card-val { font-size: 20px; color: var(--yellow); text-shadow: 0 0 10px rgba(255, 204, 0, 0.3); }
-  #base-val { font-size: 10px; color: var(--cyan); margin-top: 8px; font-weight: 600; letter-spacing: 0.5px; }
+  .card-lbl { font-size: 12px; color: #586069; text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
+  .card-val { font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 5px; color: #24292e; }
+  .card-unit { font-size: 12px; color: #6a737d; }
+  #base-val { font-size: 11px; color: #0366d6; margin-top: 8px; font-weight: 600; background: #f1f8ff; display: inline-block; padding: 2px 8px; border-radius: 10px; }
 
-  /* --- Actuator/Alert Cards --- */
+  /* --- Actuator Cards --- */
   .actuators { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-  .act-card {
-    text-align: center;
-    padding: 12px;
-    border: 1px solid var(--glass-border);
-    transition: 0.3s;
-  }
-  .act-title { font-size: 11px; color: var(--text-muted); letter-spacing: 1.5px; margin-bottom: 5px; }
-  .act-state { font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: bold; color: var(--green); text-shadow: 0 0 8px rgba(0, 250, 154, 0.4); }
+  .act-card { text-align: center; padding: 12px; transition: 0.3s; }
+  .act-title { font-size: 12px; color: #586069; font-weight: 600; margin-bottom: 5px; }
+  .act-state { font-size: 18px; font-weight: bold; color: #28a745; }
   
-  /* State saat bahaya */
-  .act-card.active {
-    border-color: var(--red);
-    background: rgba(255, 51, 102, 0.1);
-    box-shadow: 0 0 15px rgba(255, 51, 102, 0.3);
-  }
-  .act-card.active .act-state {
-    color: var(--red);
-    text-shadow: 0 0 10px rgba(255, 51, 102, 0.6);
-    animation: blinkText 0.8s infinite alternate;
-  }
-  @keyframes blinkText { from { opacity: 1; } to { opacity: 0.4; } }
+  .act-card.active { border: 1px solid #f97583; background: #ffeef0; }
+  .act-card.active .act-state { color: #cb2431; }
 
   /* --- Simulator Section --- */
-  .simulator-section h3 {
-    font-size: 13px; color: var(--cyan); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(0, 229, 255, 0.2); padding-bottom: 6px;
-  }
-  .control-group label { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: block; }
+  .simulator-section h3 { font-size: 14px; color: #24292e; margin-bottom: 12px; }
+  .control-group label { font-size: 12px; color: #586069; margin-bottom: 8px; display: block; }
   .slider-container { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-  
-  input[type=range] { flex: 1; -webkit-appearance: none; background: transparent; }
-  input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%;
-    background: var(--cyan); box-shadow: 0 0 10px var(--cyan); margin-top: -6px; cursor: pointer; transition: 0.2s;
-  }
-  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
-  #slider-txt { font-family: 'Orbitron', sans-serif; font-size: 16px; color: var(--cyan); min-width: 30px; display: inline-block; text-align: right; }
+  input[type=range] { flex: 1; accent-color: #0366d6; }
+  #slider-txt { font-size: 16px; font-weight: 700; color: #0366d6; min-width: 30px; text-align: right; }
 
   .btn-baseline {
-    width: 100%; padding: 10px; border-radius: 8px; font-size: 12px; font-weight: 700; letter-spacing: 1px;
-    background: transparent; color: var(--yellow); border: 1px solid var(--yellow); cursor: pointer; transition: 0.3s;
+    width: 100%; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    background: #fff; color: #24292e; border: 1px solid #d1d5da; cursor: pointer; transition: 0.2s;
   }
-  .btn-baseline:hover:not([disabled]) { background: rgba(255, 204, 0, 0.1); box-shadow: 0 0 15px rgba(255, 204, 0, 0.3); }
-  .btn-baseline:disabled { opacity: 0.5; cursor: not-allowed; border-color: var(--text-muted); color: var(--text-muted); }
+  .btn-baseline:hover:not([disabled]) { background: #f6f8fa; border-color: #0366d6; }
 
   /* --- Chart Section --- */
-  .chart-panel { height: 220px; padding: 10px 15px; position: relative; }
-  canvas { width: 100% !important; height: 100% !important; }
-  #chart-error { display:none; text-align:center; font-size:12px; color:var(--red); padding-top: 80px; }
+  .charts-container { display: flex; flex-direction: column; gap: 15px; }
+  .chart-box { height: 180px; position: relative; padding: 10px; }
+  .chart-title { font-size: 13px; font-weight: 600; color: #24292e; margin-bottom: 5px; text-align: center; }
+  canvas { width: 100% !important; height: 140px !important; }
 
-  #last-up { font-size: 11px; color: var(--text-muted); text-align: center; letter-spacing: 1px; margin-top: -5px; }
+  #last-up { font-size: 11px; color: #6a737d; text-align: center; margin-top: 10px; }
 
   @media (max-width: 480px) {
     .cards { grid-template-columns: 1fr; }
-    .card::before { width: 3px; height: 100%; top: 0; left: 0; right: auto; }
   }
 </style>
 </head>
@@ -240,171 +155,196 @@
       <img src="https://upload.wikimedia.org/wikipedia/id/4/44/Logo_PENS.png" alt="Logo PENS" class="inst-logo">
       <div class="inst-text">
         Politeknik Elektronika<br>Negeri Surabaya
-        <span>Bridge to the future</span>
+        <span>Departemen Teknik Elektro</span>
       </div>
     </div>
-    <h1>DRIVER MONITORING SIMULATION</h1>
+    <h1>Safety Driver Simulation</h1>
     <p>Galang Habibbullah</p>
   </header>
 
-  <button id="btn-conn" class="glass-panel btn-connect">INISIALISASI KONEKSI ARDUINO</button>
+  <button id="btn-conn" class="neo-card btn-connect">Hubungkan Perangkat Serial</button>
 
-  <div id="banner" class="glass-panel">
+  <div id="banner" class="neo-card">
     <div id="dot"></div>
     <div>
-      <div id="st-label" style="color:var(--text-main)">OFFLINE</div>
-      <div id="st-sub">Menunggu sinkronisasi port serial...</div>
+      <div id="st-label">OFFLINE</div>
+      <div id="st-sub">Menunggu koneksi dari Arduino...</div>
     </div>
   </div>
 
   <div class="cards">
-    <div class="card c-red">
+    <div class="neo-card card c-red">
       <div class="card-lbl">Heart Rate</div>
       <div class="card-val" id="bpm">--</div>
       <div class="card-unit">BPM</div>
-      <div id="base-val">BASE: --</div>
+      <div id="base-val">Base: --</div>
     </div>
-    <div class="card c-yel">
-      <div class="card-lbl">Pitch Angle</div>
+    <div class="neo-card card c-blu">
+      <div class="card-lbl">Pitch</div>
       <div class="card-val" id="pitch">--</div>
-      <div class="card-unit">DEG</div>
+      <div class="card-unit">Derajat</div>
     </div>
-    <div class="card c-yel">
-      <div class="card-lbl">Roll Angle</div>
+    <div class="neo-card card c-grn">
+      <div class="card-lbl">Roll</div>
       <div class="card-val" id="roll">--</div>
-      <div class="card-unit">DEG</div>
+      <div class="card-unit">Derajat</div>
     </div>
   </div>
 
   <div class="actuators">
-    <div class="glass-panel act-card" id="card-buzzer">
-      <div class="act-title">ALARM BUZZER</div>
-      <div class="act-state" id="state-buzzer">MATI</div>
+    <div class="neo-card act-card" id="card-buzzer">
+      <div class="act-title">Buzzer Alert</div>
+      <div class="act-state" id="state-buzzer">Mati</div>
     </div>
-    <div class="glass-panel act-card" id="card-vibro">
-      <div class="act-title">MOTOR VIBRATOR</div>
-      <div class="act-state" id="state-vibro">MATI</div>
+    <div class="neo-card act-card" id="card-vibro">
+      <div class="act-title">Vibration Alert</div>
+      <div class="act-state" id="state-vibro">Mati</div>
     </div>
   </div>
 
-  <div class="simulator-section glass-panel">
-    <h3>Detak jantung</h3>
+  <div class="charts-container">
+    <div class="neo-card chart-box">
+      <div class="chart-title">Grafik Fluktuasi Detak Jantung (BPM)</div>
+      <canvas id="chartBPM"></canvas>
+    </div>
+    <div class="neo-card chart-box">
+      <div class="chart-title">Grafik Pergerakan Postur (Pitch)</div>
+      <canvas id="chartPitch"></canvas>
+    </div>
+    <div class="neo-card chart-box">
+      <div class="chart-title">Grafik Pergerakan Postur (Roll)</div>
+      <canvas id="chartRoll"></canvas>
+    </div>
+  </div>
+
+  <div class="neo-card simulator-section">
+    <h3>Atur BPM Manual (Simulasi)</h3>
     <div class="control-group">
-      <label>Kalibrasi Input BPM Manual:</label>
       <div class="slider-container">
         <input type="range" id="bpm-slider" min="40" max="140" value="80" disabled oninput="updateSliderVal(this.value)">
-        <span id="slider-txt">80</span> <span style="font-size: 12px; color: var(--text-muted);">BPM</span>
+        <span id="slider-txt">80</span> <span style="font-size: 12px; color: #586069;">BPM</span>
       </div>
     </div>
-    <button id="btn-base" class="btn-baseline" disabled onclick="setBaseline()">TETAPKAN SEBAGAI BASELINE</button>
-  </div>
-
-  <div class="glass-panel chart-panel">
-    <canvas id="liveChart"></canvas>
-    <div id="chart-error">Grafik Gagal Dimuat (Cek Internet Anda)</div>
+    <button id="btn-base" class="btn-baseline" disabled onclick="setBaseline()">Tetapkan Sebagai Baseline</button>
   </div>
 
   <div id="last-up">Sistem Siaga.</div>
 </div>
 
 <script>
-let port;
-let writer;
-let baselineBPM = 0;
-let currentSimBPM = 80;
-let chartObj = null;
+// ================= DATA GRAFIK GLOBAL =================
+const MAX_POINTS = 30; // Menampilkan 30 titik data terakhir
+let labelsData = Array(MAX_POINTS).fill('');
+let bpmData = Array(MAX_POINTS).fill(null);
+let pitchData = Array(MAX_POINTS).fill(null);
+let rollData = Array(MAX_POINTS).fill(null);
+let statusData = Array(MAX_POINTS).fill(false); // Menyimpan history "Apakah sedang bahaya?"
+
+let cBPM, cPitch, cRoll;
+
+// Plugin Kustom Chart.js untuk menggambar blok abu-abu (Fase Mengantuk)
+const drowsyHighlightPlugin = {
+  id: 'drowsyHighlight',
+  beforeDraw: (chart) => {
+    const { ctx, chartArea: { top, bottom, left, right }, scales: { x } } = chart;
+    ctx.save();
+    ctx.fillStyle = 'rgba(200, 200, 200, 0.4)'; // Warna abu-abu fase mengantuk
+    
+    for (let i = 0; i < statusData.length; i++) {
+      if (statusData[i]) {
+        const startX = x.getPixelForValue(i);
+        // Lebar blok = jarak dari titik ini ke titik berikutnya
+        const endX = (i < statusData.length - 1) ? x.getPixelForValue(i + 1) : right;
+        
+        if (startX >= left && startX <= right) {
+          const width = Math.max(endX - startX, 2);
+          ctx.fillRect(startX, top, width, bottom - top);
+        }
+      }
+    }
+    ctx.restore();
+  }
+};
 
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('btn-conn').addEventListener('click', connectSerial);
-  initChart();
+  initCharts();
 });
 
-// --- Fungsi Inisialisasi Grafik ---
-function initChart() {
-  try {
-    if (typeof Chart !== 'undefined') {
-      const ctx = document.getElementById('liveChart').getContext('2d');
-      const maxDataPoints = 25; // Jumlah titik data yang tampil di layar
-      
-      chartObj = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: Array(maxDataPoints).fill(''),
-          datasets: [
-            { label: 'BPM', borderColor: '#ff3366', backgroundColor: 'rgba(255, 51, 102, 0.1)', data: Array(maxDataPoints).fill(null), tension: 0.4, borderWidth: 2, pointRadius: 0, fill: true },
-            { label: 'Pitch', borderColor: '#00e5ff', data: Array(maxDataPoints).fill(null), tension: 0.4, borderWidth: 2, pointRadius: 0 },
-            { label: 'Roll', borderColor: '#ffcc00', data: Array(maxDataPoints).fill(null), tension: 0.4, borderWidth: 2, pointRadius: 0 }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          animation: { duration: 0 }, // Matikan animasi agar update serial tidak patah-patah
-          plugins: { 
-            legend: { labels: { color: '#e0fbfc', font: { family: 'Rajdhani', size: 12 } } }
-          },
-          scales: { 
-            x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#8ea8c3', font: { size: 10 } } }, 
-            y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#8ea8c3', font: { size: 10 } } } 
-          }
-        }
-      });
-    } else {
-      document.getElementById('liveChart').style.display = 'none';
-      document.getElementById('chart-error').style.display = 'block';
-    }
-  } catch (e) {
-    console.error("Grafik error:", e);
+function createChartConfig(dataArray, borderColor, labelName) {
+  return {
+    type: 'line',
+    data: {
+      labels: labelsData,
+      datasets: [{
+        label: labelName,
+        data: dataArray,
+        borderColor: borderColor,
+        borderWidth: 2,
+        pointRadius: 0,
+        tension: 0.1
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: { duration: 0 },
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#f0f2f5' }, ticks: { display: false } },
+        y: { grid: { color: '#f0f2f5' }, ticks: { font: { size: 10 } } }
+      }
+    },
+    plugins: [drowsyHighlightPlugin] // Pasang plugin blok abu-abu
+  };
+}
+
+function initCharts() {
+  if (typeof Chart !== 'undefined') {
+    cBPM = new Chart(document.getElementById('chartBPM').getContext('2d'), createChartConfig(bpmData, '#cb2431', 'BPM')); // Merah
+    cPitch = new Chart(document.getElementById('chartPitch').getContext('2d'), createChartConfig(pitchData, '#0366d6', 'Pitch')); // Biru
+    cRoll = new Chart(document.getElementById('chartRoll').getContext('2d'), createChartConfig(rollData, '#28a745', 'Roll')); // Hijau
   }
 }
 
-// --- Fungsi Memperbarui Grafik ---
-function updateChartData(bpm, pitch, roll) {
-  if (!chartObj) return;
+function updateChartsRealtime(bpm, pitch, roll, isBahaya) {
+  if (!cBPM) return;
   
   const timeNow = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   
-  chartObj.data.labels.push(timeNow);
-  chartObj.data.labels.shift();
-  chartObj.data.datasets[0].data.push(bpm);
-  chartObj.data.datasets[0].data.shift();
-  chartObj.data.datasets[1].data.push(pitch);
-  chartObj.data.datasets[1].data.shift();
-  chartObj.data.datasets[2].data.push(roll);
-  chartObj.data.datasets[2].data.shift();
+  // Geser array data
+  labelsData.push(timeNow); labelsData.shift();
+  bpmData.push(bpm); bpmData.shift();
+  pitchData.push(pitch); pitchData.shift();
+  rollData.push(roll); rollData.shift();
+  statusData.push(isBahaya); statusData.shift(); // Simpan status True(Bahaya) atau False(Normal) untuk grafik
   
-  chartObj.update();
+  // Update tampilan
+  cBPM.update(); cPitch.update(); cRoll.update();
 }
+
+// ================= LOGIKA SERIAL API =================
+let port; let writer; let baselineBPM = 0; let currentSimBPM = 80;
 
 async function connectSerial() {
   if (!("serial" in navigator)) {
-    alert("Browser Anda tidak mendukung Web Serial API. Gunakan Google Chrome/Edge di PC.");
+    alert("Gunakan Google Chrome/Edge di PC.");
     return;
   }
-
   try {
     port = await navigator.serial.requestPort();
     await port.open({ baudRate: 115200 });
-    
     writer = port.writable.getWriter();
     
     document.getElementById('bpm-slider').disabled = false;
     document.getElementById('btn-base').disabled = false;
     
-    document.getElementById('btn-conn').textContent = "TERHUBUNG / SINKRONISASI AKTIF";
-    document.getElementById('btn-conn').style.color = "var(--green)";
-    document.getElementById('btn-conn').style.borderColor = "var(--green)";
-    document.getElementById('btn-conn').style.textShadow = "0 0 8px rgba(0, 250, 154, 0.5)";
+    const btnConn = document.getElementById('btn-conn');
+    btnConn.textContent = "Terhubung ke Arduino";
+    btnConn.classList.add('active');
     
-    document.getElementById('st-label').textContent = "NORMAL";
-    document.getElementById('st-label').style.color = "var(--green)";
-    document.getElementById('st-sub').textContent = "Sistem berjalan baik";
-
     sendSimulatedBPM();
     readSerial();
   } catch (error) {
     console.error("Gagal membuka port serial:", error);
-    alert("Koneksi dibatalkan atau gagal terhubung.");
   }
 }
 
@@ -417,7 +357,7 @@ function updateSliderVal(val) {
 
 function setBaseline() {
   baselineBPM = currentSimBPM;
-  document.getElementById('base-val').textContent = "BASE: " + baselineBPM + " BPM";
+  document.getElementById('base-val').textContent = "Base: " + baselineBPM;
   sendSimulatedBPM();
 }
 
@@ -430,7 +370,7 @@ async function sendSimulatedBPM() {
 
 async function readSerial() {
   const decoder = new TextDecoderStream();
-  const inputClosed = port.readable.pipeTo(decoder.writable);
+  port.readable.pipeTo(decoder.writable);
   const reader = decoder.readable.getReader();
 
   try {
@@ -456,53 +396,42 @@ async function readSerial() {
             const bn = document.getElementById('banner');
             const sl = document.getElementById('st-label');
             const ss = document.getElementById('st-sub');
-            
             const cardBuzzer = document.getElementById('card-buzzer');
             const stateBuzzer = document.getElementById('state-buzzer');
             const cardVibro = document.getElementById('card-vibro');
             const stateVibro = document.getElementById('state-vibro');
             
+            let isBahaya = false;
+
             if(data.status === 'BAHAYA'){
-              // Aktifkan Banner Merah
-              bn.className = 'glass-panel danger';
-              sl.style.color = 'var(--red)';
-              sl.textContent = 'BAHAYA — MENGANTUK';
-              ss.textContent = 'Buzzer Menyala! Segera Berhenti!';
+              isBahaya = true;
+              bn.className = 'neo-card danger';
+              sl.textContent = 'MENGANTUK';
+              ss.textContent = 'Pengendara Mengantuk';
               
-              // Aktifkan Kotak Buzzer & Vibrator
-              cardBuzzer.classList.add('active');
-              stateBuzzer.textContent = "AKTIF";
-              cardVibro.classList.add('active');
-              stateVibro.textContent = "AKTIF";
+              cardBuzzer.classList.add('active'); stateBuzzer.textContent = "Aktif";
+              cardVibro.classList.add('active'); stateVibro.textContent = "Aktif";
             } else {
-              // Kembalikan ke Normal
-              bn.className = 'glass-panel';
-              sl.style.color = 'var(--green)';
-              sl.textContent = 'NORMAL';
-              ss.textContent = 'Pengemudi dalam kondisi baik';
+              isBahaya = false;
+              bn.className = 'neo-card';
+              sl.textContent = 'Aman';
+              ss.textContent = 'Pengemudi fokus';
               
-              // Matikan Kotak Buzzer & Vibrator
-              cardBuzzer.classList.remove('active');
-              stateBuzzer.textContent = "MATI";
-              cardVibro.classList.remove('active');
-              stateVibro.textContent = "MATI";
+              cardBuzzer.classList.remove('active'); stateBuzzer.textContent = "Mati";
+              cardVibro.classList.remove('active'); stateVibro.textContent = "Mati";
             }
             
-            // Perbarui Grafik Real-Time
-            updateChartData(currentSimBPM, parseFloat(data.pitch), parseFloat(data.roll));
+            // Masukkan data ke grafik
+            updateChartsRealtime(currentSimBPM, parseFloat(data.pitch), parseFloat(data.roll), isBahaya);
             
-            document.getElementById('last-up').textContent = 
-              'UPDATE TERAKHIR: ' + new Date().toLocaleTimeString('id-ID');
+            document.getElementById('last-up').textContent = 'Update Terakhir: ' + new Date().toLocaleTimeString('id-ID');
               
-          } catch(e) {
-            // Abaikan error parse JSON
-          }
+          } catch(e) { }
         }
       }
     }
   } catch (error) {
-    console.error("Error saat membaca Serial:", error);
-    document.getElementById('last-up').textContent = 'KONEKSI TERPUTUS';
+    document.getElementById('last-up').textContent = 'Koneksi Terputus';
   } finally {
     reader.releaseLock();
   }
