@@ -12,7 +12,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body {
-            background-color: #e6ebf0; /* Warna abu-abu kebiruan terang khas Neumorphism */
+            background-color: #e6ebf0;
             color: #333;
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
@@ -77,10 +77,7 @@
             box-shadow: inset 4px 4px 8px #c4c9cd, inset -4px -4px 8px #ffffff;
             transition: 0.3s;
         }
-        #banner i {
-            font-size: 30px;
-            color: #8b949e;
-        }
+        #banner i { font-size: 30px; color: #8b949e; }
         .status-text { display: flex; flex-direction: column; }
         .status-title { font-size: 16px; font-weight: 700; color: #555; }
         .status-sub { font-size: 12px; color: #777; }
@@ -129,6 +126,20 @@
             cursor: pointer;
         }
         .btn-baseline:active { box-shadow: inset 3px 3px 6px #c4c9cd, inset -3px -3px 6px #ffffff; }
+
+        /* --- Pitch & Roll Mini Cards --- */
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .mini-card {
+            text-align: center;
+            padding: 15px;
+        }
+        .mini-lbl { font-size: 14px; font-weight: 600; color: #555; margin-bottom: 8px; }
+        .mini-val { font-size: 28px; font-weight: 700; color: #e3b341; line-height: 1; }
+        .mini-unit { font-size: 11px; color: #777; margin-top: 5px; }
 
         /* --- Slider Section --- */
         .slider-section h3 { font-size: 14px; margin-bottom: 10px; font-weight: 600; }
@@ -239,6 +250,19 @@
         <div style="text-align: center; margin-top: 8px; font-size: 11px; color: #777;" id="base-val">Base: Belum diatur</div>
     </div>
 
+    <div class="sensor-grid">
+        <div class="neo-card mini-card">
+            <div class="mini-lbl">Pitch</div>
+            <div class="mini-val" id="val-pitch">--</div>
+            <div class="mini-unit">derajat</div>
+        </div>
+        <div class="neo-card mini-card">
+            <div class="mini-lbl">Roll</div>
+            <div class="mini-val" id="val-roll">--</div>
+            <div class="mini-unit">derajat</div>
+        </div>
+    </div>
+
     <div class="slider-section">
         <h3>Atur BPM</h3>
         <div class="slider-container">
@@ -249,7 +273,7 @@
     <div class="alerts">
         <div class="neo-card alert-card" id="card-vib">
             <h4>Vibration Alert</h4>
-            <div class="alert-icon"><i class="fas fa-steering-wheel" style="font-family: 'Font Awesome 6 Free'; font-weight: 900;"></i></div> <div class="alert-icon"><i class="fas fa-dharmachakra"></i></div> 
+            <div class="alert-icon"><i class="fas fa-dharmachakra"></i></div> 
             <span class="alert-badge" id="badge-vib">Vibration: Mati</span>
         </div>
         <div class="neo-card alert-card" id="card-buz">
@@ -387,13 +411,17 @@ async function readSerial() {
                     try {
                         const data = JSON.parse(line.trim());
                         
-                        // 1. Update Tampilan Banner Status
+                        // 1. Update Tampilan Angka Pitch & Roll (FUNGSI BARU DITAMBAHKAN KEMBALI)
+                        document.getElementById('val-pitch').textContent = data.pitch;
+                        document.getElementById('val-roll').textContent = data.roll;
+                        
+                        // 2. Update Tampilan Banner Status
                         const bn = document.getElementById('banner');
                         const icon = document.getElementById('status-icon');
                         const sl = document.getElementById('st-label');
                         const ss = document.getElementById('st-sub');
                         
-                        // 2. Update Alert Cards
+                        // 3. Update Alert Cards
                         const cardVib = document.getElementById('card-vib');
                         const cardBuz = document.getElementById('card-buz');
                         const bdgVib = document.getElementById('badge-vib');
@@ -423,7 +451,7 @@ async function readSerial() {
                             bdgBuz.textContent = 'Buzzer: Mati';
                         }
 
-                        // 3. Update Chart
+                        // 4. Update Chart
                         updateChartData(currentSimBPM, data.pitch, data.roll);
                         
                     } catch(e) {
